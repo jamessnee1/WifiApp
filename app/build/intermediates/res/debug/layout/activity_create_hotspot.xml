@@ -1,0 +1,30 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#282828">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="group107.wifiapp.CreateHotspotActivity"
+        android:layout_alignParentBottom="true" />
+
+    <Button
+        android:id="@+id/createHotspotButton"
+        android:layout_width="250dp"
+        android:layout_height="45dp"
+        android:layout_gravity="center"
+        android:text="Create new hotspot"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>
+
+
+
+
+
+<!-- From: file:/Users/jamessnee/AndroidStudioProjects/WiFiApp/app/src/main/res/layout/activity_create_hotspot.xml -->
