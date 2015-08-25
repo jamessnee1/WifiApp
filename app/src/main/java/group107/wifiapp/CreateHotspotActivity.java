@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -24,7 +25,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class CreateHotspotActivity extends FragmentActivity implements GoogleMap.OnMarkerDragListener {
+public class CreateHotspotActivity extends FragmentActivity implements GoogleMap.OnMarkerDragListener, GoogleMap.OnMapClickListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -131,6 +132,7 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
 
     }
 
+
     //marker change listener
 
     LatLng fromPosition;
@@ -154,6 +156,17 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
         toPosition = marker.getPosition();
         Toast.makeText(getApplicationContext(), "Marker " + marker.getTitle() + " dragged from " +
                 fromPosition +  " to " + toPosition, Toast.LENGTH_LONG).show();
+
+    }
+
+    //add map marker map click listener
+    @Override
+    public void onMapClick(LatLng latLng) {
+
+        MarkerOptions endPointMarker =  new MarkerOptions().position
+                (new LatLng(latLng.latitude, latLng.longitude)).title("End Point");
+
+        mMap.addMarker(endPointMarker);
 
     }
 
@@ -202,7 +215,7 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
     }
 
     //method for the pop up overlay when the new button is clicked
-    public void createNewHotspotDialog() {
+    public void createNewHotspotDialog(View v) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Create new hotspot");
