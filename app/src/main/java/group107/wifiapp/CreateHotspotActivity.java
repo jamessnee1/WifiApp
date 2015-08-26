@@ -11,8 +11,10 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
@@ -20,12 +22,15 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class CreateHotspotActivity extends FragmentActivity implements GoogleMap.OnMarkerDragListener, GoogleMap.OnMapClickListener {
+import java.util.ArrayList;
+
+public class CreateHotspotActivity extends FragmentActivity implements GoogleMap.OnMarkerDragListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -33,6 +38,11 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
     private LocationListener listener = null;
     private LocationManager locationManager = null;
     private Location myLocationGPS, myLocationNetwork;
+    private MarkerOptions startPointMarker, endPointMarker;
+    private int numOfMarkers;
+    private LatLng start, end;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +97,8 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
      */
     private void setUpMap() {
 
+        numOfMarkers = 1;
+
         //Enable My Location button layer (user can choose this to get their location)
         mMap.setMyLocationEnabled(true);
 
@@ -118,8 +130,6 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
             finish();
         }
 
-        //setup button to create new hotspot
-
 
         //setup map type, can possibly be changed in options
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -127,8 +137,58 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
         //initial starting message
         Toast.makeText(this, "Long-press on markers to move them. To add an end point, tap the screen.", Toast.LENGTH_LONG).show();
 
-        //for testing
-        //createNewHotspotDialog();
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+
+                if (numOfMarkers < 2) {
+                    endPointMarker = new MarkerOptions().position
+                            (new LatLng(latLng.latitude, latLng.longitude)).title("End Point").draggable(true);
+
+                    mMap.addMarker(endPointMarker);
+                    //save position into end
+                    end = latLng;
+                }
+
+                //make sure we only have two markers on screen
+                numOfMarkers = 2;
+
+            }
+        });
+
+
+        //setup button listener
+        Button createHotspotButton = (Button)findViewById(R.id.createHotspotButton);
+        createHotspotButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //ensure there are two markers
+                if (numOfMarkers < 2){
+
+                    //show alert
+                    AlertDialog alert = new AlertDialog.Builder(CreateHotspotActivity.this).create();
+                    alert.setTitle("Error");
+                    alert.setMessage("No end point detected! To add an end point, tap the screen.");
+                    alert.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    alert.show();
+
+                }
+                else {
+                    createNewHotspotDialog(v);
+                }
+
+            }
+        });
+
+
+
 
     }
 
@@ -153,22 +213,20 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
     @Override
     public void onMarkerDragEnd(Marker marker) {
 
+        //check which marker was moved and save coordinates
+        if (marker.getTitle() == "Start Point"){
+            start = marker.getPosition();
+        }
+        else {
+            end = marker.getPosition();
+        }
+
         toPosition = marker.getPosition();
         Toast.makeText(getApplicationContext(), "Marker " + marker.getTitle() + " dragged from " +
                 fromPosition +  " to " + toPosition, Toast.LENGTH_LONG).show();
 
     }
 
-    //add map marker map click listener
-    @Override
-    public void onMapClick(LatLng latLng) {
-
-        MarkerOptions endPointMarker =  new MarkerOptions().position
-                (new LatLng(latLng.latitude, latLng.longitude)).title("End Point");
-
-        mMap.addMarker(endPointMarker);
-
-    }
 
     public class myLocationListener implements LocationListener {
 
@@ -182,9 +240,10 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLngStart, 20);
             mMap.animateCamera(cameraUpdate);
             //add marker to current location
-            MarkerOptions startPoint;
-            mMap.addMarker(startPoint = new MarkerOptions().position(latLngStart).title("Start point").draggable(true));
+            mMap.addMarker(startPointMarker = new MarkerOptions().position(latLngStart).title("Start point").draggable(true));
 
+            //save start coords
+            start = latLngStart;
 
             //check if incoming position has come from GPS or Network
             if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
@@ -214,23 +273,32 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
         }
     }
 
+
+
     //method for the pop up overlay when the new button is clicked
     public void createNewHotspotDialog(View v) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Create new hotspot");
 
+
+
+        final TextView hotspotTitle = new TextView(this);
+        hotspotTitle.setText("Enter hotspot name:");
         final EditText hotspotName = new EditText(this);
-        hotspotName.setHint("Hotspot name");
+        final TextView passwordTitle = new TextView(this);
+        passwordTitle.setText("Enter hotspot password:");
         final EditText hotspotPassword = new EditText(this);
-        hotspotPassword.setHint("Hotspot password");
 
         hotspotName.setInputType(InputType.TYPE_CLASS_TEXT);
         hotspotPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
+
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(hotspotTitle);
         layout.addView(hotspotName);
+        layout.addView(passwordTitle);
         layout.addView(hotspotPassword);
         builder.setView(layout);
 
@@ -240,8 +308,31 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
             public void onClick(DialogInterface dialog, int which) {
 
                 //get inputs and send them to the AppData
-                //String hotspot_name = hotspotName.getText();
-                //String hotspot_pass = hotspotPassword.getText();
+                String hotspot_name = hotspotName.getText().toString();
+                String hotspot_pass = hotspotPassword.getText().toString();
+
+                //isWifiHotspotEnabled;
+                double lat_startPt = start.latitude;
+                double long_startPt = start.longitude;
+                double lat_endPt = end.latitude;
+                double long_endPt = end.longitude;
+
+
+                AppData.getInstance().setHotspotName(hotspot_name);
+                AppData.getInstance().setPassword(hotspot_pass);
+                AppData.getInstance().setIsUserConnected(1);
+                AppData.getInstance().setIsWifiEnabled(true);
+
+                AppData.getInstance().setLat_startPoint(lat_startPt);
+                AppData.getInstance().setLong_startPoint(long_startPt);
+                AppData.getInstance().setLat_endPoint(lat_endPt);
+                AppData.getInstance().setLong_endPoint(long_endPt);
+                //startTime;
+                //endTime;
+                //dataAllowed;
+                //timeAllowed;
+                
+
             }
         });
 

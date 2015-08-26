@@ -10,7 +10,7 @@ import android.view.View;
 
 public class MainMenuActivity extends AppCompatActivity {
 
-    //may move database to singleton to be able to access it anywhere in the app
+    //may move database to google maps activity because it is created there
     DatabaseHandler hotspotDb;
 
     @Override
@@ -18,8 +18,8 @@ public class MainMenuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
-        AppData.getInstance().setDeviceName("Test Device");
-        Log.d("onCreate", "Device Name is " + AppData.getInstance().getDeviceName());
+        AppData.getInstance().setHotspotName("Test Device");
+        Log.d("onCreate", "Device Name is " + AppData.getInstance().getHotspotName());
         hotspotDb = new DatabaseHandler(this);
 
     }

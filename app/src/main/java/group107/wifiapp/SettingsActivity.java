@@ -22,7 +22,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        Log.d("onCreate Settings", "Device name is " + AppData.getInstance().getDeviceName());
+        Log.d("onCreate Settings", "Device name is " + AppData.getInstance().getHotspotName());
 
         //wifi on/off switch
         Switch wifiSwitch = (Switch)findViewById(R.id.settingsWifiSwitch);
