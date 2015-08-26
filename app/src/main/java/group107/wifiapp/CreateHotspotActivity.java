@@ -310,7 +310,7 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
         final EditText hotspotPassword = new EditText(this);
 
         hotspotName.setInputType(InputType.TYPE_CLASS_TEXT);
-        hotspotPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        hotspotPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
 
         LinearLayout layout = new LinearLayout(this);
@@ -379,14 +379,11 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
     public void copyDatabase() {
 
         //get source path and dest path
-        String sourcePath = getApplicationContext().getDatabasePath(DatabaseHandler.DATABASE_NAME).toString();
+        File database = getApplicationContext().getDatabasePath(DatabaseHandler.DATABASE_NAME);
 
-        File database = new File(sourcePath);
+        File newDatabase = Environment.getExternalStoragePublicDirectory
+                (Environment.DIRECTORY_DOCUMENTS);
 
-        String destinationPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString();
-
-
-        File newDatabase = new File(destinationPath);
 
         try {
 
@@ -399,7 +396,7 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
         }
 
         Toast.makeText(getApplicationContext(), "copied file " + DatabaseHandler.DATABASE_NAME + " from " +
-                        sourcePath + " to " + destinationPath,
+                        database.toString() + " to " + newDatabase.toString(),
                 Toast.LENGTH_LONG).show();
 
     }

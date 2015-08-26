@@ -14,13 +14,23 @@
 
     <Button
         android:id="@+id/createHotspotButton"
-        android:layout_width="250dp"
-        android:layout_height="45dp"
-        android:layout_gravity="center"
+        android:layout_width="170dp"
+        android:layout_height="50dp"
         android:text="Create new hotspot"
+        android:textSize="14dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="170dp"
+        android:layout_height="50dp"
+        android:textSize="14dp"
+        android:text="Users"
+        android:id="@+id/usersButton"
+        android:layout_alignTop="@+id/createHotspotButton"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>
 
