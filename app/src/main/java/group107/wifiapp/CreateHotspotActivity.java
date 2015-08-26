@@ -34,6 +34,9 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
+    //Database helper
+    private DatabaseHandler db;
+
     //listener, locationmanager and instances to GPS and Network
     private LocationListener listener = null;
     private LocationManager locationManager = null;
@@ -48,6 +51,9 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_hotspot);
+
+        db = new DatabaseHandler(this);
+
         setUpMapIfNeeded();
     }
 
@@ -169,6 +175,7 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
                     //show alert
                     AlertDialog alert = new AlertDialog.Builder(CreateHotspotActivity.this).create();
                     alert.setTitle("Error");
+                    alert.setCancelable(false);
                     alert.setMessage("No end point detected! To add an end point, tap the screen.");
                     alert.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
                         @Override
@@ -281,6 +288,9 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Create new hotspot");
 
+        //dont allow outside touch to cancel
+        builder.setCancelable(false);
+
 
 
         final TextView hotspotTitle = new TextView(this);
@@ -331,7 +341,10 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
                 //endTime;
                 //dataAllowed;
                 //timeAllowed;
-                
+
+                //add to database
+                db.insertData();
+
 
             }
         });

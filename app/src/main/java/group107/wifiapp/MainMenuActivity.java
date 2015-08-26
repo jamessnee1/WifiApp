@@ -10,8 +10,6 @@ import android.view.View;
 
 public class MainMenuActivity extends AppCompatActivity {
 
-    //may move database to google maps activity because it is created there
-    DatabaseHandler hotspotDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,7 +18,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
         AppData.getInstance().setHotspotName("Test Device");
         Log.d("onCreate", "Device Name is " + AppData.getInstance().getHotspotName());
-        hotspotDb = new DatabaseHandler(this);
+
 
     }
 
