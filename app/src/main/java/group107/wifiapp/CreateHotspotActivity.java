@@ -7,9 +7,11 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,6 +30,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 public class CreateHotspotActivity extends FragmentActivity implements GoogleMap.OnMarkerDragListener {
@@ -345,6 +354,12 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
                 //add to database
                 db.insertData();
 
+                //Toast.makeText(getApplicationContext(), "Created file: " +
+                 //               getApplicationContext().getDatabasePath(DatabaseHandler.DATABASE_NAME).toString(),
+                //        Toast.LENGTH_LONG).show();
+
+                copyDatabase();
+
 
             }
         });
@@ -357,6 +372,36 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
         });
 
         builder.show();
+    }
+
+    //This method is to get around having to enable root access to device, copy database file to
+    //documents folder on the device to ensure expected data appears in database. For testing only.
+    public void copyDatabase() {
+
+        //get source path and dest path
+        String sourcePath = getApplicationContext().getDatabasePath(DatabaseHandler.DATABASE_NAME).toString();
+
+        File database = new File(sourcePath);
+
+        String destinationPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString();
+
+
+        File newDatabase = new File(destinationPath);
+
+        try {
+
+            FileUtils.copyFile(database, newDatabase);
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        }
+
+        Toast.makeText(getApplicationContext(), "copied file " + DatabaseHandler.DATABASE_NAME + " from " +
+                        sourcePath + " to " + destinationPath,
+                Toast.LENGTH_LONG).show();
+
     }
 
 }

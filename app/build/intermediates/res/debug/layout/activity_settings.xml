@@ -23,8 +23,8 @@
         android:layout_centerHorizontal="true" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="250dp"
+        android:layout_height="45dp"
         android:text="Credits"
         android:id="@+id/creditsButton"
         android:layout_alignParentBottom="true"
@@ -43,5 +43,14 @@
         android:layout_below="@+id/settingsWifiSwitch"
         android:layout_alignLeft="@+id/settingsWifiSwitch"
         android:layout_alignStart="@+id/settingsWifiSwitch" />
+
+    <Button
+        android:layout_width="250dp"
+        android:layout_height="45dp"
+        android:text="Clear Hotspots"
+        android:id="@+id/clearHotspotButton"
+        android:layout_above="@+id/creditsButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp" />
 </RelativeLayout>
 <!-- From: file:/Users/jamessnee/AndroidStudioProjects/WiFiApp/app/src/main/res/layout/activity_settings.xml -->

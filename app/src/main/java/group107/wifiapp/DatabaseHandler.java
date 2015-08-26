@@ -38,7 +38,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         //CREATE TABLE IF NOT EXISTS should be used here to ensure we don't lose data. For now, this is just for testing.
-        db.execSQL("create table " + TABLE_NAME +" (ID INTEGER PRIMARY KEY AUTOINCREMENT, HOTSPOT_NAME TEXT, " +
+        db.execSQL("create table " + TABLE_NAME + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, HOTSPOT_NAME TEXT, " +
                 "PASSWORD TEXT, NUMOFUSERS INT, ISWIFIENABLED INTEGER, ISWIFIHOTSPOTENABLED INTEGER, LAT_STARTPOINT TEXT, LONG_STARTPOINT TEXT," +
                 "LAT_ENDPOINT TEXT, LONG_ENDPOINT TEXT, STARTTIME TEXT, ENDTIME TEXT, " +
                 "DATAALLOWED TEXT, TIMEALLOWED TEXT)");
@@ -89,4 +89,5 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return true;
     }
+
 }

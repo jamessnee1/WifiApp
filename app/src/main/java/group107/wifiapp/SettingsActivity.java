@@ -115,7 +115,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         AlertDialog credits = new AlertDialog.Builder(SettingsActivity.this).create();
         credits.setTitle("Programming Project 1 - Group 107 - Credits");
-
+        credits.setCancelable(false);
         credits.setMessage("Programming: James Snee\nProgramming: Trent Rozkowicz\n" +
                 "Assistant Programming: Lincoln Birch\nDesign: Pei Chuang\nProject Supervisor:" +
                 " Azadeh Ghari Neiat");
