@@ -17,7 +17,7 @@
         android:layout_width="170dp"
         android:layout_height="50dp"
         android:text="Create new hotspot"
-        android:textSize="14dp"
+        android:textSize="12dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -25,7 +25,7 @@
     <Button
         android:layout_width="170dp"
         android:layout_height="50dp"
-        android:textSize="14dp"
+        android:textSize="12dp"
         android:text="Users"
         android:id="@+id/usersButton"
         android:layout_alignTop="@+id/createHotspotButton"

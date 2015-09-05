@@ -3,6 +3,7 @@ package group107.wifiapp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -13,9 +14,12 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +33,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.apache.commons.io.FileUtils;
 
@@ -39,7 +45,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-public class CreateHotspotActivity extends FragmentActivity implements GoogleMap.OnMarkerDragListener {
+public class CreateHotspotActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -52,7 +58,13 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
     private Location myLocationGPS, myLocationNetwork;
     private MarkerOptions startPointMarker, endPointMarker;
     private int numOfMarkers;
+    //latLng for start and end markers, as well as drag positions
     private LatLng start, end;
+    private LatLng fromPosition;
+    private LatLng toPosition;
+    private Polyline mapLine;
+    private boolean polyline;
+    int numOfUsersChoice = 0;
 
 
 
@@ -94,8 +106,6 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
 
-            //SET UP LISTENERS HERE
-            mMap.setOnMarkerDragListener(this);
 
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
@@ -113,6 +123,7 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
     private void setUpMap() {
 
         numOfMarkers = 1;
+        polyline = false;
 
         //Enable My Location button layer (user can choose this to get their location)
         mMap.setMyLocationEnabled(true);
@@ -127,9 +138,12 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
         //call the listener with either network or GPS (whichever is not null, GPS has priority)
         if (myLocationGPS == null){
             listener.onLocationChanged(myLocationNetwork);
+
+
         }
         else if (myLocationNetwork == null) {
             listener.onLocationChanged(myLocationGPS);
+
         }
         //if both GPS and Wifi values are null, show error and finish activity
         else if (myLocationGPS == null && myLocationNetwork == null){
@@ -158,7 +172,7 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
 
                 if (numOfMarkers < 2) {
                     endPointMarker = new MarkerOptions().position
-                            (new LatLng(latLng.latitude, latLng.longitude)).title("End Point").draggable(true);
+                            (new LatLng(latLng.latitude, latLng.longitude)).title("End point").draggable(true);
 
                     mMap.addMarker(endPointMarker);
                     //save position into end
@@ -167,6 +181,52 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
 
                 //make sure we only have two markers on screen
                 numOfMarkers = 2;
+
+                drawPolyline();
+                polyline = true;
+
+
+            }
+        });
+
+        //on marker drag listener
+        mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+
+                fromPosition = marker.getPosition();
+                //if we have two map markers, remove polyline
+                if (numOfMarkers == 2) {
+                    drawPolyline();
+                }
+
+            }
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+
+                toPosition = marker.getPosition();
+
+                //check which marker was moved and save coordinates
+                if (marker.getTitle() == "Start point"){
+                    start = marker.getPosition();
+                }
+                else {
+                    end = marker.getPosition();
+                }
+
+                Toast.makeText(getApplicationContext(), "Marker " + marker.getTitle() + " dragged from " +
+                        fromPosition +  " to " + toPosition, Toast.LENGTH_LONG).show();
+
+                //draw polyline
+                if (numOfMarkers == 2) {
+                    drawPolyline();
+                }
 
             }
         });
@@ -208,41 +268,20 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
 
     }
 
+    //draw polyline method
+    public void drawPolyline(){
 
-    //marker change listener
-
-    LatLng fromPosition;
-    LatLng toPosition;
-
-    @Override
-    public void onMarkerDragStart(Marker marker) {
-
-        fromPosition = marker.getPosition();
-
-    }
-
-    @Override
-    public void onMarkerDrag(Marker marker) {
-
-    }
-
-    @Override
-    public void onMarkerDragEnd(Marker marker) {
-
-        //check which marker was moved and save coordinates
-        if (marker.getTitle() == "Start Point"){
-            start = marker.getPosition();
+        if (polyline == false) {
+            //We only want one polyline between two points
+            mapLine = mMap.addPolyline(new PolylineOptions().add(start, end).width(5).color(Color.RED));
         }
         else {
-            end = marker.getPosition();
+            //remove line and reset
+            mapLine.remove();
+            polyline = false;
         }
 
-        toPosition = marker.getPosition();
-        Toast.makeText(getApplicationContext(), "Marker " + marker.getTitle() + " dragged from " +
-                fromPosition +  " to " + toPosition, Toast.LENGTH_LONG).show();
-
     }
-
 
     public class myLocationListener implements LocationListener {
 
@@ -252,14 +291,17 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
 
             //create new LatLng for start point
             LatLng latLngStart = new LatLng(location.getLatitude(), location.getLongitude());
-            //animate camera to current location, 1 is furthest away and 21 is closest
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLngStart, 20);
-            mMap.animateCamera(cameraUpdate);
-            //add marker to current location
-            mMap.addMarker(startPointMarker = new MarkerOptions().position(latLngStart).title("Start point").draggable(true));
 
             //save start coords
             start = latLngStart;
+
+            //animate camera to current location, 1 is furthest away and 21 is closest
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(start, 20);
+            mMap.animateCamera(cameraUpdate);
+            //add marker to current location
+            mMap.addMarker(startPointMarker = new MarkerOptions().position(start).title("Start point").draggable(true));
+
+
 
             //check if incoming position has come from GPS or Network
             if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
@@ -301,13 +343,67 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
         builder.setCancelable(false);
 
 
-
         final TextView hotspotTitle = new TextView(this);
         hotspotTitle.setText("Enter hotspot name:");
         final EditText hotspotName = new EditText(this);
         final TextView passwordTitle = new TextView(this);
         passwordTitle.setText("Enter hotspot password:");
         final EditText hotspotPassword = new EditText(this);
+
+        final TextView numOfUsersTitle = new TextView(this);
+        numOfUsersTitle.setText("Select number of users:");
+
+        //spinner for number of users
+        Spinner numOfUsersSpinner = new Spinner(this);
+        ArrayList<String> users = new ArrayList<String>();
+
+        users.add("1");
+        users.add("2");
+        users.add("3");
+        users.add("4");
+        users.add("5");
+
+
+        final ArrayAdapter<String> usersArrayAdapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_spinner_item, users);
+
+        usersArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        numOfUsersSpinner.setAdapter(usersArrayAdapter);
+
+        numOfUsersSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                switch (position) {
+
+                    //Number of users will always be 1 if nothing selected
+                    case 0:
+                        numOfUsersChoice = 1;
+                        break;
+                    case 1:
+                        numOfUsersChoice = 2;
+                        break;
+                    case 2:
+                        numOfUsersChoice = 3;
+                        break;
+                    case 3:
+                        numOfUsersChoice = 4;
+                        break;
+                    case 4:
+                        numOfUsersChoice = 5;
+                        break;
+                    default:
+                        break;
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 
         hotspotName.setInputType(InputType.TYPE_CLASS_TEXT);
         hotspotPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
@@ -319,12 +415,15 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
         layout.addView(hotspotName);
         layout.addView(passwordTitle);
         layout.addView(hotspotPassword);
+        layout.addView(numOfUsersTitle);
+        layout.addView(numOfUsersSpinner);
         builder.setView(layout);
 
         //set up buttons
         builder.setPositiveButton("Register Hotspot", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+
 
                 //get inputs and send them to the AppData
                 String hotspot_name = hotspotName.getText().toString();
@@ -340,6 +439,7 @@ public class CreateHotspotActivity extends FragmentActivity implements GoogleMap
                 AppData.getInstance().setHotspotName(hotspot_name);
                 AppData.getInstance().setPassword(hotspot_pass);
                 AppData.getInstance().setIsUserConnected(1);
+                AppData.getInstance().setNumOfUsers(numOfUsersChoice);
                 AppData.getInstance().setIsWifiEnabled(true);
 
                 AppData.getInstance().setLat_startPoint(lat_startPt);
