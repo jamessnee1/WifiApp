@@ -476,7 +476,9 @@ public class CreateHotspotActivity extends FragmentActivity {
 
 
                 //get inputs and send them to the AppData
-                String hotspot_name = hotspotName.getText().toString();
+                //Hotspot name includes a suffix, this is to check later whether
+                //our app has created this wifi connection
+                String hotspot_name = hotspotName.getText().toString() + "-WifiApp";
                 String hotspot_pass = hotspotPassword.getText().toString();
 
                 //isWifiHotspotEnabled;
