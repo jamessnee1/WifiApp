@@ -137,8 +137,6 @@ public class CreateHotspotActivity extends FragmentActivity {
         myLocationGPS = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
         listener = new myLocationListener();
 
-
-
         //call the listener with either network or GPS (whichever is not null, GPS has priority)
         if (myLocationGPS == null){
             listener.onLocationChanged(myLocationNetwork);
@@ -163,7 +161,7 @@ public class CreateHotspotActivity extends FragmentActivity {
         }
 
 
-        //setup map type, can possibly be changed in options
+        //setup map type, normal as default
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         //add marker to current location
@@ -291,7 +289,7 @@ public class CreateHotspotActivity extends FragmentActivity {
 
         if (polyline == false) {
             //We only want one polyline between two points
-            PolylineOptions options = new PolylineOptions().add(start,end).width(5).color(Color.DKGRAY);
+            PolylineOptions options = new PolylineOptions().add(start,end).width(5).color(Color.RED);
 
             mapLine = mMap.addPolyline(options);
             polyline = true;
