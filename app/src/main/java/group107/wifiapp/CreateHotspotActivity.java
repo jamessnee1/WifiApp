@@ -44,6 +44,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class CreateHotspotActivity extends FragmentActivity {
 
@@ -131,14 +132,17 @@ public class CreateHotspotActivity extends FragmentActivity {
         //Get locationmanager object from system service
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
+        //get last known location with network and GPS
         myLocationNetwork = locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
         myLocationGPS = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
         listener = new myLocationListener();
 
+        //set listener to map
+
+
         //call the listener with either network or GPS (whichever is not null, GPS has priority)
         if (myLocationGPS == null){
             listener.onLocationChanged(myLocationNetwork);
-
 
         }
         else if (myLocationNetwork == null) {
@@ -175,7 +179,6 @@ public class CreateHotspotActivity extends FragmentActivity {
 
                 if (numOfMarkers < 2) {
                     endPointMarker = new MarkerOptions().position(end).title("End point").draggable(true);
-
                     mMap.addMarker(endPointMarker);
 
                 }
@@ -195,7 +198,6 @@ public class CreateHotspotActivity extends FragmentActivity {
 
                 fromPosition = marker.getPosition();
 
-
                 //if we have two map markers, remove polyline
                 if (numOfMarkers == 2) {
                     drawPolyline();
@@ -211,7 +213,9 @@ public class CreateHotspotActivity extends FragmentActivity {
             @Override
             public void onMarkerDragEnd(Marker marker) {
 
+
                 toPosition = marker.getPosition();
+
 
                 //check which marker was moved and save coordinates
                 if (marker.getTitle() == "Start point"){
@@ -284,8 +288,10 @@ public class CreateHotspotActivity extends FragmentActivity {
 
         if (polyline == false) {
             //We only want one polyline between two points
-            mapLine = mMap.addPolyline(new PolylineOptions().add(startPointMarker.getPosition(),
-                    endPointMarker.getPosition()).width(5).color(Color.DKGRAY));
+            PolylineOptions options = new PolylineOptions().add(startPointMarker.getPosition(),
+                    endPointMarker.getPosition()).width(5).color(Color.DKGRAY);
+            
+            mapLine = mMap.addPolyline(options);
             polyline = true;
         }
         else {
@@ -304,7 +310,6 @@ public class CreateHotspotActivity extends FragmentActivity {
 
             //create new LatLng for start point
             start = new LatLng(location.getLatitude(), location.getLongitude());
-
 
             //animate camera to current location, 1 is furthest away and 21 is closest
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(start, 20);
@@ -369,11 +374,7 @@ public class CreateHotspotActivity extends FragmentActivity {
         Spinner numOfUsersSpinner = new Spinner(this);
         ArrayList<String> users = new ArrayList<String>();
 
-        users.add("1");
-        users.add("2");
-        users.add("3");
-        users.add("4");
-        users.add("5");
+        Collections.addAll(users, "1", "2", "3", "4", "5");
 
 
         final ArrayAdapter<String> usersArrayAdapter = new ArrayAdapter<String>
