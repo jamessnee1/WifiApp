@@ -2175,28 +2175,30 @@ containing a value of this type.
         public static final int abc_search_view=0x7f040016;
         public static final int abc_select_dialog_material=0x7f040017;
         public static final int abc_simple_dropdown_hint=0x7f040018;
-        public static final int activity_create_hotspot=0x7f040019;
-        public static final int activity_main_menu=0x7f04001a;
-        public static final int activity_settings=0x7f04001b;
-        public static final int mr_media_route_chooser_dialog=0x7f04001c;
-        public static final int mr_media_route_controller_material_dialog_b=0x7f04001d;
-        public static final int mr_media_route_list_item=0x7f04001e;
-        public static final int notification_media_action=0x7f04001f;
-        public static final int notification_media_cancel_action=0x7f040020;
-        public static final int notification_template_big_media=0x7f040021;
-        public static final int notification_template_big_media_narrow=0x7f040022;
-        public static final int notification_template_lines=0x7f040023;
-        public static final int notification_template_media=0x7f040024;
-        public static final int notification_template_part_chronometer=0x7f040025;
-        public static final int notification_template_part_time=0x7f040026;
-        public static final int select_dialog_item_material=0x7f040027;
-        public static final int select_dialog_multichoice_material=0x7f040028;
-        public static final int select_dialog_singlechoice_material=0x7f040029;
-        public static final int support_simple_spinner_dropdown_item=0x7f04002a;
+        public static final int activity_connect_to_existing_hotspot=0x7f040019;
+        public static final int activity_create_hotspot=0x7f04001a;
+        public static final int activity_main_menu=0x7f04001b;
+        public static final int activity_settings=0x7f04001c;
+        public static final int mr_media_route_chooser_dialog=0x7f04001d;
+        public static final int mr_media_route_controller_material_dialog_b=0x7f04001e;
+        public static final int mr_media_route_list_item=0x7f04001f;
+        public static final int notification_media_action=0x7f040020;
+        public static final int notification_media_cancel_action=0x7f040021;
+        public static final int notification_template_big_media=0x7f040022;
+        public static final int notification_template_big_media_narrow=0x7f040023;
+        public static final int notification_template_lines=0x7f040024;
+        public static final int notification_template_media=0x7f040025;
+        public static final int notification_template_part_chronometer=0x7f040026;
+        public static final int notification_template_part_time=0x7f040027;
+        public static final int select_dialog_item_material=0x7f040028;
+        public static final int select_dialog_multichoice_material=0x7f040029;
+        public static final int select_dialog_singlechoice_material=0x7f04002a;
+        public static final int support_simple_spinner_dropdown_item=0x7f04002b;
     }
     public static final class menu {
-        public static final int menu_main_menu=0x7f0e0000;
-        public static final int menu_settings=0x7f0e0001;
+        public static final int menu_connect_to_existing_hotspot=0x7f0e0000;
+        public static final int menu_main_menu=0x7f0e0001;
+        public static final int menu_settings=0x7f0e0002;
     }
     public static final class mipmap {
         public static final int ic_launcher=0x7f030000;
@@ -2280,8 +2282,9 @@ containing a value of this type.
         public static final int status_bar_notification_info_overflow=0x7f070049;
         public static final int store_picture_message=0x7f07004a;
         public static final int store_picture_title=0x7f07004b;
-        public static final int title_activity_create_hotspot=0x7f07004c;
-        public static final int title_activity_settings=0x7f07004d;
+        public static final int title_activity_connect_to_existing_hotspot=0x7f07004c;
+        public static final int title_activity_create_hotspot=0x7f07004d;
+        public static final int title_activity_settings=0x7f07004e;
         public static final int wallet_buy_button_place_holder=0x7f070037;
     }
     public static final class style {

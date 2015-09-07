@@ -344,6 +344,7 @@
     <string name="store_picture_title">Save image</string>
     <!-- From: file:/Users/jamessnee/AndroidStudioProjects/WiFiApp/app/src/main/res/values/strings.xml -->
     <eat-comment/>
+    <string name="title_activity_connect_to_existing_hotspot">Connect to existing hotspot</string>
     <string name="title_activity_create_hotspot">Create Hotspot</string>
     <string name="title_activity_settings">Settings</string>
     <!-- From: file:/Users/jamessnee/AndroidStudioProjects/WiFiApp/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-wallet/7.5.0/res/values/wallet_strings.xml -->

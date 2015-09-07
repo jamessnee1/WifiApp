@@ -1,8 +1,11 @@
 package group107.wifiapp;
 
+import android.net.wifi.WifiManager;
+
 /**
  * Created by James on 8/13/2015.
  * This class is a singleton class which will store all the app settings
+ * accessable from anywhere within the app
  */
 public class AppData {
 
@@ -23,6 +26,7 @@ public class AppData {
     private String endTime;
     private float dataAllowed;
     private float timeAllowed;
+
 
     private AppData(){
         //Constructor, settings to go here
@@ -106,8 +110,6 @@ public class AppData {
 
 
     //setters
-
-
     public static void setInstance(AppData instance) {
         AppData.instance = instance;
     }
@@ -161,4 +163,5 @@ public class AppData {
     public void setTimeAllowed(float timeAllowed) {
         this.timeAllowed = timeAllowed;
     }
+
 }

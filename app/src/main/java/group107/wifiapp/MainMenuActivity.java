@@ -54,6 +54,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
     public void connectToHotspotButtonPressed(View view) {
         //takes the user to a ListActivity to view the stored Hotspots already created
+        Intent intent = new Intent(this, ConnectToExistingHotspotActivity.class);
+        startActivity(intent);
     }
 
     public void settingsButtonPressed(View view) {

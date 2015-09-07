@@ -71,6 +71,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="group107.wifiapp.MainMenuActivity" />
         </activity>
+        <activity
+            android:name="group107.wifiapp.ConnectToExistingHotspotActivity"
+            android:label="@string/title_activity_connect_to_existing_hotspot"
+            android:parentActivityName="group107.wifiapp.MainMenuActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="group107.wifiapp.MainMenuActivity" />
+        </activity>
         <!-- Include the AdActivity and InAppPurchaseActivity configChanges and themes. -->
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
