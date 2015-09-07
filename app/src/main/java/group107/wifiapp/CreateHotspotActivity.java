@@ -170,31 +170,32 @@ public class CreateHotspotActivity extends FragmentActivity {
             @Override
             public void onMapClick(LatLng latLng) {
 
+                //save position into end
+                end = latLng;
+
                 if (numOfMarkers < 2) {
-                    endPointMarker = new MarkerOptions().position
-                            (new LatLng(latLng.latitude, latLng.longitude)).title("End point").draggable(true);
+                    endPointMarker = new MarkerOptions().position(end).title("End point").draggable(true);
 
                     mMap.addMarker(endPointMarker);
-                    //save position into end
-                    end = latLng;
+
                 }
 
                 //make sure we only have two markers on screen
                 numOfMarkers = 2;
-
                 drawPolyline();
-                polyline = true;
-
 
             }
         });
 
         //on marker drag listener
         mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+
             @Override
             public void onMarkerDragStart(Marker marker) {
 
                 fromPosition = marker.getPosition();
+
+
                 //if we have two map markers, remove polyline
                 if (numOfMarkers == 2) {
                     drawPolyline();
@@ -215,9 +216,19 @@ public class CreateHotspotActivity extends FragmentActivity {
                 //check which marker was moved and save coordinates
                 if (marker.getTitle() == "Start point"){
                     start = marker.getPosition();
+                    //update position
+                    startPointMarker.position(start);
+
                 }
                 else {
-                    end = marker.getPosition();
+
+                    //if second marker has been created
+                    if (numOfMarkers == 2) {
+                        end = marker.getPosition();
+                        //update position
+                        endPointMarker.position(end);
+                    }
+
                 }
 
                 Toast.makeText(getApplicationContext(), "Marker " + marker.getTitle() + " dragged from " +
@@ -273,7 +284,9 @@ public class CreateHotspotActivity extends FragmentActivity {
 
         if (polyline == false) {
             //We only want one polyline between two points
-            mapLine = mMap.addPolyline(new PolylineOptions().add(start, end).width(5).color(Color.RED));
+            mapLine = mMap.addPolyline(new PolylineOptions().add(startPointMarker.getPosition(),
+                    endPointMarker.getPosition()).width(5).color(Color.DKGRAY));
+            polyline = true;
         }
         else {
             //remove line and reset
@@ -290,16 +303,15 @@ public class CreateHotspotActivity extends FragmentActivity {
         public void onLocationChanged(Location location) {
 
             //create new LatLng for start point
-            LatLng latLngStart = new LatLng(location.getLatitude(), location.getLongitude());
+            start = new LatLng(location.getLatitude(), location.getLongitude());
 
-            //save start coords
-            start = latLngStart;
 
             //animate camera to current location, 1 is furthest away and 21 is closest
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(start, 20);
             mMap.animateCamera(cameraUpdate);
             //add marker to current location
-            mMap.addMarker(startPointMarker = new MarkerOptions().position(start).title("Start point").draggable(true));
+            startPointMarker = new MarkerOptions().position(start).title("Start point").draggable(true);
+            mMap.addMarker(startPointMarker);
 
 
 
