@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,8 +68,9 @@ public class CreateHotspotActivity extends FragmentActivity {
     private LatLng end_fromPosition, end_toPosition;
     private Polyline mapLine;
     private boolean polyline;
-    private boolean startMoved, endMoved;
     int numOfUsersChoice = 0;
+    int dataAllowedChoice = 0;
+    int timeAllowedChoice = 0;
 
 
 
@@ -170,7 +172,6 @@ public class CreateHotspotActivity extends FragmentActivity {
         //add marker to current location
         startPointMarker = new MarkerOptions().position(start).title("Start point").draggable(true);
         mMap.addMarker(startPointMarker);
-        startMoved = false;
 
         //initial starting message
         Toast.makeText(this, "Long-press on markers to move them. To add an end point, tap the screen.", Toast.LENGTH_LONG).show();
@@ -185,7 +186,6 @@ public class CreateHotspotActivity extends FragmentActivity {
                 if (numOfMarkers < 2) {
                     endPointMarker = new MarkerOptions().position(end).title("End point").draggable(true);
                     mMap.addMarker(endPointMarker);
-                    endMoved = false;
                     //make sure we only have two markers on screen
                     numOfMarkers = 2;
                     drawPolyline();
@@ -206,10 +206,10 @@ public class CreateHotspotActivity extends FragmentActivity {
 
                 //check which marker
                 if (marker.getTitle() == "Start point"){
+                    start = marker.getPosition();
                     start_fromPosition = marker.getPosition();
 
-                    //if we have two map markers, update polyline (values passed to drawPolyLine are
-                    //arbitrary, as it will remove the line anyway)
+                    //if we have two map markers, remove polyline
                     if (numOfMarkers == 2) {
                         drawPolyline();
                     }
@@ -217,8 +217,8 @@ public class CreateHotspotActivity extends FragmentActivity {
                 }
                 else {
                     end_fromPosition = marker.getPosition();
-                    //if we have two map markers, update polyline (values passed to drawPolyLine are
-                    //arbitrary, as it will remove the line anyway)
+                    end = marker.getPosition();
+                    //if we have two map markers, remove polyline
                     if (numOfMarkers == 2) {
                         drawPolyline();
                     }
@@ -242,8 +242,7 @@ public class CreateHotspotActivity extends FragmentActivity {
                     start_toPosition = marker.getPosition();
                     start = marker.getPosition();
                     //update position
-                    startPointMarker.position(start);
-                    startMoved = true;
+                    startPointMarker.position(start_toPosition);
 
                     //draw polyline
                     if (numOfMarkers == 2) {
@@ -258,8 +257,7 @@ public class CreateHotspotActivity extends FragmentActivity {
                         end = marker.getPosition();
                         end_toPosition = marker.getPosition();
                         //update position
-                        endPointMarker.position(end);
-                        endMoved = true;
+                        endPointMarker.position(end_toPosition);
                         //draw polyline
                         drawPolyline();
                     }
@@ -470,6 +468,39 @@ public class CreateHotspotActivity extends FragmentActivity {
         dataAllowedSpinner.setAdapter(dataAllowedArrayAdapter);
 
         //set listener for data allowed spinner here
+        dataAllowedSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                switch(position){
+
+                    case 0:
+                        dataAllowedChoice = 5;
+                        break;
+                    case 1:
+                        dataAllowedChoice = 10;
+                        break;
+                    case 2:
+                        dataAllowedChoice = 15;
+                        break;
+                    case 3:
+                        dataAllowedChoice = 20;
+                        break;
+                    case 4:
+                        dataAllowedChoice = 25;
+                        break;
+                    case 5:
+                        dataAllowedChoice = 30;
+                        break;
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         final TextView timeAllowedTitle = new TextView(this);
         timeAllowedTitle.setText("Select allowed time:");
@@ -487,6 +518,40 @@ public class CreateHotspotActivity extends FragmentActivity {
         timeAllowedSpinner.setAdapter(timeAllowedArrayAdapter);
 
         //set listener for time allowed spinner here
+        timeAllowedSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                switch(position){
+
+                    case 0:
+                        timeAllowedChoice = 5;
+                        break;
+                    case 1:
+                        timeAllowedChoice = 10;
+                        break;
+                    case 2:
+                        timeAllowedChoice = 15;
+                        break;
+                    case 3:
+                        timeAllowedChoice = 20;
+                        break;
+                    case 4:
+                        timeAllowedChoice = 25;
+                        break;
+                    case 5:
+                        timeAllowedChoice = 30;
+                        break;
+
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         //text field input
         hotspotName.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -538,8 +603,8 @@ public class CreateHotspotActivity extends FragmentActivity {
                 AppData.getInstance().setLong_endPoint(long_endPt);
                 //startTime;
                 //endTime;
-                //dataAllowed;
-                //timeAllowed;
+                AppData.getInstance().setDataAllowed(dataAllowedChoice);
+                AppData.getInstance().setTimeAllowed(timeAllowedChoice);
 
                 //add to database
                 db.insertData();
@@ -569,25 +634,61 @@ public class CreateHotspotActivity extends FragmentActivity {
     public void copyDatabase() {
 
         //get source path and dest path
-        File database = getApplicationContext().getDatabasePath(DatabaseHandler.DATABASE_NAME);
+        String databasePath = getApplicationContext().getDatabasePath(DatabaseHandler.DATABASE_NAME).getPath();
+        File db = new File(databasePath);
 
-        File newDatabase = Environment.getExternalStoragePublicDirectory
-                (Environment.DIRECTORY_DOCUMENTS);
+        //input and output streams
+        InputStream in = null;
+        OutputStream out = null;
+
+        //check if our file exists
+        if (db.exists()){
+
+            try {
+
+                File dir = new File("/mnt/sdcard/DB_DEBUG");
+
+                if(!dir.exists()){
+                    dir.mkdir();
+                }
+
+                in = new FileInputStream(databasePath);
+                out = new FileOutputStream(dir.getAbsolutePath() + "/" + DatabaseHandler.DATABASE_NAME);
 
 
-        try {
+                byte[] buffer = new byte[1024];
+                int length;
 
-            FileUtils.copyFile(database, newDatabase);
+                while((length = in.read(buffer)) > 0){
+                    out.write(buffer, 0, length);
+                }
 
-        } catch (IOException e) {
+                out.flush();
+            }
+            catch(Exception e){
 
-            e.printStackTrace();
+            }finally {
+
+                try{
+                    if (in != null){
+                        in.close();
+                        in = null;
+                    }
+                    if(out != null){
+                        out.close();
+                        out = null;
+                    }
+                }
+                catch(Exception e){
+
+                }
+
+            }
 
         }
 
-        Toast.makeText(getApplicationContext(), "copied file " + DatabaseHandler.DATABASE_NAME + " from " +
-                        database.toString() + " to " + newDatabase.toString(),
-                Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Copied file " + DatabaseHandler.DATABASE_NAME + " from " +
+                        databasePath + " to mnt/sdcard/DB_DEBUG", Toast.LENGTH_LONG).show();
 
     }
 

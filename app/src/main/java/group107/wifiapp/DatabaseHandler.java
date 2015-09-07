@@ -53,6 +53,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
+    //method to delete all data
+    public void deleteAllData(){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(this.TABLE_NAME, null, null);
+
+    }
+
     //method to insert data
     public boolean insertData(){
 

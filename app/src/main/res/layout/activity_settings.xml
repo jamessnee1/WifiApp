@@ -53,5 +53,6 @@
         android:id="@+id/clearHotspotButton"
         android:layout_above="@+id/creditsButton"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="30dp" />
+        android:layout_marginBottom="30dp"
+        android:onClick="clearHotspotButtonPressed"/>
 </RelativeLayout>

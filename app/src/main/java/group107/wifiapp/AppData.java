@@ -1,6 +1,7 @@
 package group107.wifiapp;
 
 import android.net.wifi.WifiManager;
+import android.provider.ContactsContract;
 
 /**
  * Created by James on 8/13/2015.

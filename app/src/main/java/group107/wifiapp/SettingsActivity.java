@@ -3,6 +3,7 @@ package group107.wifiapp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import java.lang.reflect.Method;
 
@@ -88,29 +90,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-
     public void showCreditsAlert(View view) {
 
         AlertDialog credits = new AlertDialog.Builder(SettingsActivity.this).create();
@@ -167,6 +146,38 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         return false;
+
+    }
+
+    //clear all hotspots
+    public void clearHotspotButtonPressed(View view) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        builder.setTitle("Clear all hotspots");
+        builder.setMessage("WARNING: This will clear all saved hotspots. Are you sure you want to continue?");
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                //clear database here
+                
+                Toast.makeText(getApplicationContext(), "All hotspots deleted!", Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+
+            }
+        });
+
+        builder.show();
 
     }
 }
