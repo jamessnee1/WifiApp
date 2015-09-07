@@ -63,8 +63,11 @@ public class CreateHotspotActivity extends FragmentActivity {
     private LatLng start, end;
     private LatLng fromPosition;
     private LatLng toPosition;
+    private LatLng start_fromPosition, start_toPosition;
+    private LatLng end_fromPosition, end_toPosition;
     private Polyline mapLine;
     private boolean polyline;
+    private boolean startMoved, endMoved;
     int numOfUsersChoice = 0;
 
 
@@ -167,6 +170,7 @@ public class CreateHotspotActivity extends FragmentActivity {
         //add marker to current location
         startPointMarker = new MarkerOptions().position(start).title("Start point").draggable(true);
         mMap.addMarker(startPointMarker);
+        startMoved = false;
 
         //initial starting message
         Toast.makeText(this, "Long-press on markers to move them. To add an end point, tap the screen.", Toast.LENGTH_LONG).show();
@@ -181,6 +185,7 @@ public class CreateHotspotActivity extends FragmentActivity {
                 if (numOfMarkers < 2) {
                     endPointMarker = new MarkerOptions().position(end).title("End point").draggable(true);
                     mMap.addMarker(endPointMarker);
+                    endMoved = false;
                     //make sure we only have two markers on screen
                     numOfMarkers = 2;
                     drawPolyline();
@@ -199,10 +204,26 @@ public class CreateHotspotActivity extends FragmentActivity {
 
                 fromPosition = marker.getPosition();
 
-                //if we have two map markers, remove polyline
-                if (numOfMarkers == 2) {
-                    drawPolyline();
+                //check which marker
+                if (marker.getTitle() == "Start point"){
+                    start_fromPosition = marker.getPosition();
+
+                    //if we have two map markers, update polyline (values passed to drawPolyLine are
+                    //arbitrary, as it will remove the line anyway)
+                    if (numOfMarkers == 2) {
+                        drawPolyline();
+                    }
+
                 }
+                else {
+                    end_fromPosition = marker.getPosition();
+                    //if we have two map markers, update polyline (values passed to drawPolyLine are
+                    //arbitrary, as it will remove the line anyway)
+                    if (numOfMarkers == 2) {
+                        drawPolyline();
+                    }
+                }
+
 
             }
 
@@ -214,15 +235,20 @@ public class CreateHotspotActivity extends FragmentActivity {
             @Override
             public void onMarkerDragEnd(Marker marker) {
 
-
                 toPosition = marker.getPosition();
-
 
                 //check which marker was moved and save coordinates
                 if (marker.getTitle() == "Start point"){
+                    start_toPosition = marker.getPosition();
                     start = marker.getPosition();
                     //update position
                     startPointMarker.position(start);
+                    startMoved = true;
+
+                    //draw polyline
+                    if (numOfMarkers == 2) {
+                        drawPolyline();
+                    }
 
                 }
                 else {
@@ -230,8 +256,12 @@ public class CreateHotspotActivity extends FragmentActivity {
                     //if second marker has been created
                     if (numOfMarkers == 2) {
                         end = marker.getPosition();
+                        end_toPosition = marker.getPosition();
                         //update position
                         endPointMarker.position(end);
+                        endMoved = true;
+                        //draw polyline
+                        drawPolyline();
                     }
 
                 }
@@ -239,10 +269,6 @@ public class CreateHotspotActivity extends FragmentActivity {
                 Toast.makeText(getApplicationContext(), "Marker " + marker.getTitle() + " dragged from " +
                         fromPosition +  " to " + toPosition, Toast.LENGTH_LONG).show();
 
-                //draw polyline
-                if (numOfMarkers == 2) {
-                    drawPolyline();
-                }
 
             }
         });
@@ -290,7 +316,6 @@ public class CreateHotspotActivity extends FragmentActivity {
         if (polyline == false) {
             //We only want one polyline between two points
             PolylineOptions options = new PolylineOptions().add(start,end).width(5).color(Color.RED);
-
             mapLine = mMap.addPolyline(options);
             polyline = true;
         }
