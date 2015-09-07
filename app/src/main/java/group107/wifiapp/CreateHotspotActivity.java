@@ -290,7 +290,7 @@ public class CreateHotspotActivity extends FragmentActivity {
             //We only want one polyline between two points
             PolylineOptions options = new PolylineOptions().add(startPointMarker.getPosition(),
                     endPointMarker.getPosition()).width(5).color(Color.DKGRAY);
-            
+
             mapLine = mMap.addPolyline(options);
             polyline = true;
         }
@@ -376,7 +376,6 @@ public class CreateHotspotActivity extends FragmentActivity {
 
         Collections.addAll(users, "1", "2", "3", "4", "5");
 
-
         final ArrayAdapter<String> usersArrayAdapter = new ArrayAdapter<String>
                 (this, android.R.layout.simple_spinner_item, users);
 
@@ -417,7 +416,41 @@ public class CreateHotspotActivity extends FragmentActivity {
             }
         });
 
+        final TextView dataAllowedTitle = new TextView(this);
+        dataAllowedTitle.setText("Select allowed data:");
 
+        //spinner for data allowed, this can be changed later
+        Spinner dataAllowedSpinner = new Spinner(this);
+        ArrayList<String> data = new ArrayList<String>();
+
+        Collections.addAll(data, "5mb", "10mb", "15mb", "20mb", "25mb", "30mb");
+
+        final ArrayAdapter<String> dataAllowedArrayAdapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_spinner_item, data);
+
+        dataAllowedArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dataAllowedSpinner.setAdapter(dataAllowedArrayAdapter);
+
+        //set listener for data allowed spinner here
+
+        final TextView timeAllowedTitle = new TextView(this);
+        timeAllowedTitle.setText("Select allowed time:");
+
+        //time allowed spinner, this can be changed later
+        Spinner timeAllowedSpinner = new Spinner(this);
+        ArrayList<String> time = new ArrayList<String>();
+
+        Collections.addAll(time, "5min", "10min", "15min", "20min", "25min", "30min");
+
+        final ArrayAdapter<String> timeAllowedArrayAdapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_spinner_item, time);
+
+        timeAllowedArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        timeAllowedSpinner.setAdapter(timeAllowedArrayAdapter);
+
+        //set listener for time allowed spinner here
+
+        //text field input
         hotspotName.setInputType(InputType.TYPE_CLASS_TEXT);
         hotspotPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
@@ -430,6 +463,10 @@ public class CreateHotspotActivity extends FragmentActivity {
         layout.addView(hotspotPassword);
         layout.addView(numOfUsersTitle);
         layout.addView(numOfUsersSpinner);
+        layout.addView(dataAllowedTitle);
+        layout.addView(dataAllowedSpinner);
+        layout.addView(timeAllowedTitle);
+        layout.addView(timeAllowedSpinner);
         builder.setView(layout);
 
         //set up buttons
