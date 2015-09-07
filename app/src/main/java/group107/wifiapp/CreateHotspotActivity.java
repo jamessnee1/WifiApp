@@ -137,7 +137,6 @@ public class CreateHotspotActivity extends FragmentActivity {
         myLocationGPS = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
         listener = new myLocationListener();
 
-        //set listener to map
 
 
         //call the listener with either network or GPS (whichever is not null, GPS has priority)
@@ -167,6 +166,10 @@ public class CreateHotspotActivity extends FragmentActivity {
         //setup map type, can possibly be changed in options
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
+        //add marker to current location
+        startPointMarker = new MarkerOptions().position(start).title("Start point").draggable(true);
+        mMap.addMarker(startPointMarker);
+
         //initial starting message
         Toast.makeText(this, "Long-press on markers to move them. To add an end point, tap the screen.", Toast.LENGTH_LONG).show();
 
@@ -180,12 +183,12 @@ public class CreateHotspotActivity extends FragmentActivity {
                 if (numOfMarkers < 2) {
                     endPointMarker = new MarkerOptions().position(end).title("End point").draggable(true);
                     mMap.addMarker(endPointMarker);
+                    //make sure we only have two markers on screen
+                    numOfMarkers = 2;
+                    drawPolyline();
 
                 }
 
-                //make sure we only have two markers on screen
-                numOfMarkers = 2;
-                drawPolyline();
 
             }
         });
@@ -288,8 +291,7 @@ public class CreateHotspotActivity extends FragmentActivity {
 
         if (polyline == false) {
             //We only want one polyline between two points
-            PolylineOptions options = new PolylineOptions().add(startPointMarker.getPosition(),
-                    endPointMarker.getPosition()).width(5).color(Color.DKGRAY);
+            PolylineOptions options = new PolylineOptions().add(start,end).width(5).color(Color.DKGRAY);
 
             mapLine = mMap.addPolyline(options);
             polyline = true;
@@ -301,6 +303,24 @@ public class CreateHotspotActivity extends FragmentActivity {
         }
 
     }
+
+    //map buttons
+    public void normalMapButtonPressed(View view) {
+
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+    }
+
+    public void satelliteMapButtonPressed(View view) {
+
+        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+    }
+
+    public void hybridMapButtonPressed(View view) {
+
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+    }
+
 
     public class myLocationListener implements LocationListener {
 
@@ -314,11 +334,6 @@ public class CreateHotspotActivity extends FragmentActivity {
             //animate camera to current location, 1 is furthest away and 21 is closest
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(start, 20);
             mMap.animateCamera(cameraUpdate);
-            //add marker to current location
-            startPointMarker = new MarkerOptions().position(start).title("Start point").draggable(true);
-            mMap.addMarker(startPointMarker);
-
-
 
             //check if incoming position has come from GPS or Network
             if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){

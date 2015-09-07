@@ -32,6 +32,39 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Normal Map"
+        android:textSize="12dp"
+        android:id="@+id/normalMapButton"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:onClick="normalMapButtonPressed"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Satellite Map"
+        android:textSize="12dp"
+        android:id="@+id/satelliteMapButton"
+        android:onClick="satelliteMapButtonPressed"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/normalMapButton"
+        android:layout_toEndOf="@+id/normalMapButton" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hybrid Map"
+        android:textSize="12dp"
+        android:id="@+id/terrainMapButton"
+        android:onClick="hybridMapButtonPressed"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/satelliteMapButton"
+        android:layout_toEndOf="@+id/satelliteMapButton" />
+
 </RelativeLayout>
 
 

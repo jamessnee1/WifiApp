@@ -48,7 +48,7 @@ public class ConnectToExistingHotspotActivity extends AppCompatActivity {
                 if(!foundNetwork) {
 
                     createDialog("Wifi hotspot not found!", "Error: No wifi hotspots were found!");
-                    
+
                 }
             }
         }
