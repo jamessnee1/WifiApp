@@ -3,6 +3,7 @@ package group107.wifiapp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
@@ -79,6 +80,7 @@ public class CreateHotspotActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_hotspot);
 
+        //create database, this should be moved to singleton
         db = new DatabaseHandler(this);
 
         setUpMapIfNeeded();
@@ -302,8 +304,6 @@ public class CreateHotspotActivity extends FragmentActivity {
 
             }
         });
-
-
 
 
     }
@@ -605,6 +605,9 @@ public class CreateHotspotActivity extends FragmentActivity {
                 //endTime;
                 AppData.getInstance().setDataAllowed(dataAllowedChoice);
                 AppData.getInstance().setTimeAllowed(timeAllowedChoice);
+
+                //this is so we can view current hotspot data
+                AppData.getInstance().setAppDataPopulated(true);
 
                 //add to database
                 db.insertData();

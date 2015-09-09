@@ -3,9 +3,11 @@ package group107.wifiapp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,11 +22,12 @@ import java.lang.reflect.Method;
 
 public class SettingsActivity extends AppCompatActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        Log.d("onCreate Settings", "Device name is " + AppData.getInstance().getHotspotName());
+
 
         //wifi on/off switch
         Switch wifiSwitch = (Switch)findViewById(R.id.settingsWifiSwitch);
@@ -162,7 +165,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
 
                 //clear database here
-                
+                //db.deleteAllData(); Throws exception
                 Toast.makeText(getApplicationContext(), "All hotspots deleted!", Toast.LENGTH_LONG).show();
 
             }

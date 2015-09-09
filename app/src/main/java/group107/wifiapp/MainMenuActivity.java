@@ -7,8 +7,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
 public class MainMenuActivity extends AppCompatActivity {
+
+    private Button startButton;
 
 
     @Override
@@ -16,18 +19,43 @@ public class MainMenuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
-        AppData.getInstance().setHotspotName("Test Device");
-        Log.d("onCreate", "Device Name is " + AppData.getInstance().getHotspotName());
-
 
     }
 
+    protected void onResume(){
+        super.onResume();
+
+        if (AppData.getInstance().getAppDataPopulated() == true) {
+            startButton.setText("View current hotspot");
+        }
+
+    }
+
+
     //Button methods
     public void startHotspotButtonPressed(View view){
-        //takes the user to a Google Maps Activity to start the process of creating
-        //a new WiFi hotspot
-        Intent intent = new Intent(this, CreateHotspotActivity.class);
-        startActivity(intent);
+
+        //If user has already created a hotspot this session, pressing this button will
+        //take the user to a populated map
+
+        startButton = (Button)findViewById(R.id.startHotspotButton);
+        //takes the user to a Google Maps Activity to view current hotspot data that is active
+        if (AppData.getInstance().getAppDataPopulated() == true){
+            //startButton.setText("View current hotspot");
+
+            Intent viewIntent = new Intent(this, ViewCurrentHotspotActivity.class);
+            startActivity(viewIntent);
+
+        }
+        else {
+
+            //takes the user to a Google Maps Activity to start the process of creating
+            //a new WiFi hotspot
+            Intent intent = new Intent(this, CreateHotspotActivity.class);
+            startActivity(intent);
+
+        }
+
     }
 
     public void connectToHotspotButtonPressed(View view) {

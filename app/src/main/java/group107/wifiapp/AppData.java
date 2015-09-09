@@ -28,6 +28,9 @@ public class AppData {
     private float dataAllowed;
     private float timeAllowed;
 
+    //check if wifi hotspot is created or not (If appdata is populated) this is
+    //to show hotspot in a map
+    private boolean appDataPopulated = false;
 
     private AppData(){
         //Constructor, settings to go here
@@ -46,6 +49,7 @@ public class AppData {
         this.endTime = endTime;
         this.dataAllowed = dataAllowed;
         this.timeAllowed = timeAllowed;
+        this.appDataPopulated = appDataPopulated;
 
     }
 
@@ -109,6 +113,8 @@ public class AppData {
         return instance;
     }
 
+    public boolean getAppDataPopulated() { return appDataPopulated; }
+
 
     //setters
     public static void setInstance(AppData instance) {
@@ -164,5 +170,7 @@ public class AppData {
     public void setTimeAllowed(float timeAllowed) {
         this.timeAllowed = timeAllowed;
     }
+
+    public void setAppDataPopulated(boolean appDataPopulated) { this.appDataPopulated = appDataPopulated; }
 
 }

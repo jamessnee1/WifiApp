@@ -5,9 +5,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.Serializable;
+
 /**
  * Created by James on 8/15/2015.
  * Maintains methods for SQLite database
+ *
  */
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -28,6 +31,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static final String COLUMN13 = "DATAALLOWED";
     public static final String COLUMN14 = "TIMEALLOWED";
 
+
     public DatabaseHandler(Context context) {
         //context, name, version
         super(context, DATABASE_NAME, null, 1);
@@ -36,6 +40,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+
 
         //CREATE TABLE IF NOT EXISTS should be used here to ensure we don't lose data. For now, this is just for testing.
         db.execSQL("create table " + TABLE_NAME + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, HOTSPOT_NAME TEXT, " +

@@ -40,14 +40,16 @@ public class ConnectToExistingHotspotActivity extends AppCompatActivity {
                     if(foundNetworkName.equals(wifiToCheck)){
 
                         foundNetwork = true;
-                        createDialog("Wifi hotspot found!", "Wifi hotspot was found! SSID is " + foundNetworkName);
+                        createDialog("Wifi hotspot found!", "Wifi hotspot was found! SSID is "
+                                + foundNetworkName, foundNetwork);
+                        break;
 
                     }
 
                 }
                 if(!foundNetwork) {
 
-                    createDialog("Wifi hotspot not found!", "Error: No wifi hotspots were found!");
+                    createDialog("Wifi hotspot not found!", "Error: No wifi hotspots were found!", foundNetwork);
 
                 }
             }
@@ -67,7 +69,7 @@ public class ConnectToExistingHotspotActivity extends AppCompatActivity {
 
     }
 
-    public void createDialog(String title, String message){
+    public void createDialog(String title, String message, final boolean foundNetwork){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
@@ -79,6 +81,10 @@ public class ConnectToExistingHotspotActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
 
                 dialog.dismiss();
+
+                if (!foundNetwork){
+                    finish();
+                }
 
             }
         });
