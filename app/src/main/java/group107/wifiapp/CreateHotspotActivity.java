@@ -722,6 +722,7 @@ public class CreateHotspotActivity extends FragmentActivity {
                     TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
                     TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
 
+            AppData.getInstance().setTimeRemaining(millisUntilFinished);
             timerText.setText(hoursMinutesSeconds);
 
         }

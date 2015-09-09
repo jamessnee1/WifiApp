@@ -1,9 +1,11 @@
 package group107.wifiapp;
 
 import android.graphics.Color;
+import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -14,12 +16,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.concurrent.TimeUnit;
+
 public class ViewCurrentHotspotActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private MarkerOptions startPointMarker, endPointMarker;
     private LatLng start, end;
     private Polyline mapLine;
+    private TextView timerText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +83,14 @@ public class ViewCurrentHotspotActivity extends FragmentActivity {
         //Enable My Location button layer (user can choose this to get their location)
         mMap.setMyLocationEnabled(true);
 
+        //timer
+        timerText = (TextView)findViewById(R.id.timerTextView);
+        timerText.setText("00:00:00");
+
+        //set the timer to count down
+        final TimerClass timer = new TimerClass(AppData.getInstance().getTimeRemaining(), 1000);
+        timer.start();
+
         //setup map type, normal as default
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
@@ -114,6 +127,34 @@ public class ViewCurrentHotspotActivity extends FragmentActivity {
     public void hybridMapButtonPressed(View view) {
 
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+    }
+
+    //Timer Class
+    public class TimerClass extends CountDownTimer {
+
+        public TimerClass(long millisInFuture, long countDownInterval){
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+
+            long millis = millisUntilFinished;
+            String hoursMinutesSeconds = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
+                    TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+                    TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+
+            timerText.setText(hoursMinutesSeconds);
+
+        }
+
+        @Override
+        public void onFinish() {
+
+            timerText.setText("00:00:00");
+
+        }
+
     }
 
 }
