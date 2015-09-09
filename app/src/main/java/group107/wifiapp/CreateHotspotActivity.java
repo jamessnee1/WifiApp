@@ -9,6 +9,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -47,6 +48,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 public class CreateHotspotActivity extends FragmentActivity {
 
@@ -54,6 +56,10 @@ public class CreateHotspotActivity extends FragmentActivity {
 
     //Database helper
     private DatabaseHandler db;
+
+    //timer
+    private TextView timerText;
+
 
     //listener, locationmanager and instances to GPS and Network
     private LocationListener listener = null;
@@ -132,6 +138,10 @@ public class CreateHotspotActivity extends FragmentActivity {
 
         numOfMarkers = 1;
         polyline = false;
+
+        //timer
+        timerText = (TextView)findViewById(R.id.timerTextView);
+        timerText.setText("00:00:00");
 
         //Enable My Location button layer (user can choose this to get their location)
         mMap.setMyLocationEnabled(true);
@@ -341,50 +351,6 @@ public class CreateHotspotActivity extends FragmentActivity {
 
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
     }
-
-
-    public class myLocationListener implements LocationListener {
-
-
-        @Override
-        public void onLocationChanged(Location location) {
-
-            //create new LatLng for start point
-            start = new LatLng(location.getLatitude(), location.getLongitude());
-
-            //animate camera to current location, 1 is furthest away and 21 is closest
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(start, 20);
-            mMap.animateCamera(cameraUpdate);
-
-            //check if incoming position has come from GPS or Network
-            if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
-                locationManager.removeUpdates(this);
-            }else {
-                locationManager.removeUpdates(listener);
-            }
-
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-
-            locationManager.removeUpdates(this);
-            locationManager.removeUpdates(listener);
-
-        }
-    }
-
-
 
     //method for the pop up overlay when the new button is clicked
     public void createNewHotspotDialog(View v) {
@@ -618,6 +584,10 @@ public class CreateHotspotActivity extends FragmentActivity {
 
                 copyDatabase();
 
+                //set the timer to count down
+                final TimerClass timer = new TimerClass(TimeUnit.MINUTES.toMillis(timeAllowedChoice), 1000);
+                timer.start();
+
 
             }
         });
@@ -692,6 +662,76 @@ public class CreateHotspotActivity extends FragmentActivity {
 
         Toast.makeText(getApplicationContext(), "Copied file " + DatabaseHandler.DATABASE_NAME + " from " +
                         databasePath + " to mnt/sdcard/DB_DEBUG", Toast.LENGTH_LONG).show();
+
+    }
+
+    //Location Listener
+    public class myLocationListener implements LocationListener {
+
+
+        @Override
+        public void onLocationChanged(Location location) {
+
+            //create new LatLng for start point
+            start = new LatLng(location.getLatitude(), location.getLongitude());
+
+            //animate camera to current location, 1 is furthest away and 21 is closest
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(start, 20);
+            mMap.animateCamera(cameraUpdate);
+
+            //check if incoming position has come from GPS or Network
+            if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
+                locationManager.removeUpdates(this);
+            }else {
+                locationManager.removeUpdates(listener);
+            }
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+            locationManager.removeUpdates(this);
+            locationManager.removeUpdates(listener);
+
+        }
+    }
+
+    //Timer Class
+    public class TimerClass extends CountDownTimer {
+
+        public TimerClass(long millisInFuture, long countDownInterval){
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+
+            long millis = millisUntilFinished;
+            String hoursMinutesSeconds = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
+                    TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+                    TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+
+            timerText.setText(hoursMinutesSeconds);
+
+        }
+
+        @Override
+        public void onFinish() {
+
+            timerText.setText("00:00:00");
+
+        }
 
     }
 
