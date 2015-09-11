@@ -51,6 +51,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+//Create Hotspot Activity, by James Snee
+//PLEASE NOTE: If you are running this code on your machine, you will need your own Google Maps API key
+//as the one provided in res/values/google_maps_api_xml is specific to my machine
+
 public class CreateHotspotActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -122,12 +126,10 @@ public class CreateHotspotActivity extends FragmentActivity {
                 setUpMap();
             }
         }
-    }
+    } //end setUpMapIfNeeded
 
     /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p/>
+     *
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
@@ -539,7 +541,7 @@ public class CreateHotspotActivity extends FragmentActivity {
                 double lat_endPt = end.latitude;
                 double long_endPt = end.longitude;
 
-
+                AppData.getInstance().setSessionId(0); //Initially 0, this autoincrements
                 AppData.getInstance().setHotspotName(hotspot_name);
                 AppData.getInstance().setPassword(hotspot_pass);
                 AppData.getInstance().setIsUserConnected(1);
@@ -646,7 +648,7 @@ public class CreateHotspotActivity extends FragmentActivity {
         Toast.makeText(getApplicationContext(), "Copied file " + DatabaseHandler.DATABASE_NAME + " from " +
                         databasePath + " to mnt/sdcard/DB_DEBUG", Toast.LENGTH_LONG).show();
 
-    }
+    } //end copyDatabase
 
     //Location Listener
     public class myLocationListener implements LocationListener {
@@ -688,7 +690,7 @@ public class CreateHotspotActivity extends FragmentActivity {
             locationManager.removeUpdates(listener);
 
         }
-    }
+    } //end myLocationListener
 
     //Timer Class
     public class TimerClass extends CountDownTimer {
@@ -717,7 +719,7 @@ public class CreateHotspotActivity extends FragmentActivity {
 
         }
 
-    }
+    } //end TimerClass
 
     //get last known location
     public Location getLastKnownLocation(){
@@ -748,6 +750,6 @@ public class CreateHotspotActivity extends FragmentActivity {
         }
 
         return bestLocation;
-    }
+    } //end getLastKnownLocation
 
 }

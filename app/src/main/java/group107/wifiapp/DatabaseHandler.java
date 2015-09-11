@@ -93,6 +93,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN1, AppData.getInstance().getSessionId());
         contentValues.put(COLUMN2, AppData.getInstance().getHotspotName());
         contentValues.put(COLUMN3, AppData.getInstance().getPassword());
         contentValues.put(COLUMN4, AppData.getInstance().getNumOfUsers());
@@ -123,6 +124,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor retrieved = db.rawQuery("select * from " + TABLE_NAME, null);
         return retrieved;
+    }
+
+    //update data
+    public boolean updateData(){
+
+        //pretty much exactly the same as insertData, but we are going to just update the id of the hotspot
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN2, AppData.getInstance().getHotspotName());
+        contentValues.put(COLUMN3, AppData.getInstance().getPassword());
+        contentValues.put(COLUMN4, AppData.getInstance().getNumOfUsers());
+        contentValues.put(COLUMN5, AppData.getInstance().getIsWifiEnabled());
+        contentValues.put(COLUMN6, AppData.getInstance().getIsWifiHotspotEnabled());
+        contentValues.put(COLUMN7, AppData.getInstance().getLat_startPoint());
+        contentValues.put(COLUMN8, AppData.getInstance().getLong_startPoint());
+        contentValues.put(COLUMN9, AppData.getInstance().getLat_endPoint());
+        contentValues.put(COLUMN10, AppData.getInstance().getLong_endPoint());
+        contentValues.put(COLUMN11, AppData.getInstance().getStartTime());
+        contentValues.put(COLUMN12, AppData.getInstance().getEndTime());
+        contentValues.put(COLUMN13, AppData.getInstance().getDataAllowed());
+        contentValues.put(COLUMN14, AppData.getInstance().getTimeAllowed());
+
+        return false;
+
     }
 
 }
