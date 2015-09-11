@@ -48,14 +48,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class CreateHotspotActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
-    //Database helper
-    private DatabaseHandler db;
 
     //timer
     private TextView timerText;
@@ -64,7 +63,7 @@ public class CreateHotspotActivity extends FragmentActivity {
     //listener, locationmanager and instances to GPS and Network
     private LocationListener listener = null;
     private LocationManager locationManager = null;
-    private Location myLocationGPS, myLocationNetwork;
+    private Location myLocation;
     private MarkerOptions startPointMarker, endPointMarker;
     private int numOfMarkers;
     //latLng for start and end markers, as well as drag positions
@@ -85,9 +84,6 @@ public class CreateHotspotActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_hotspot);
-
-        //create database, this should be moved to singleton
-        db = new DatabaseHandler(this);
 
         setUpMapIfNeeded();
     }
@@ -149,174 +145,161 @@ public class CreateHotspotActivity extends FragmentActivity {
         //Get locationmanager object from system service
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
-        //get last known location with network and GPS
-        myLocationNetwork = locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
-        myLocationGPS = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
-        listener = new myLocationListener();
+        //get last known location
+        myLocation = getLastKnownLocation();
 
-        //call the listener with either network or GPS (whichever is not null, GPS has priority)
-        if (myLocationGPS == null){
-            listener.onLocationChanged(myLocationNetwork);
-
-        }
-        else if (myLocationNetwork == null) {
-            listener.onLocationChanged(myLocationGPS);
-
-        }
-        //if both GPS and Wifi values are null, show error and finish activity
-        else if (myLocationGPS == null && myLocationNetwork == null){
-
+        //if no location was found, IE devices wifi and GPS are off, don't even go into map
+        if(myLocation == null){
+            //throw error
             Toast.makeText(this, "Error: Could not establish connection! Please ensure that Wifi and GPS " +
                     "are turned on in your device's settings, and that you are in range.", Toast.LENGTH_LONG).show();
             finish();
-
         }
-        //we should never get to this, this is just for safety
         else {
-            Toast.makeText(this, "An unknown error occurred!", Toast.LENGTH_LONG).show();
-            finish();
-        }
 
+            listener = new myLocationListener();
+            listener.onLocationChanged(myLocation);
 
-        //setup map type, normal as default
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            //setup map type, normal as default
+            mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        //add marker to current location
-        startPointMarker = new MarkerOptions().position(start).title("Start point").draggable(true);
-        mMap.addMarker(startPointMarker);
+            //add marker to current location
+            startPointMarker = new MarkerOptions().position(start).title("Start point").draggable(true);
+            mMap.addMarker(startPointMarker);
 
-        //initial starting message
-        Toast.makeText(this, "Long-press on markers to move them. To add an end point, tap the screen.", Toast.LENGTH_LONG).show();
+            //initial starting message
+            Toast.makeText(this, "Long-press on markers to move them. To add an end point, tap the screen.", Toast.LENGTH_LONG).show();
 
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
+            mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
 
-                //save position into end
-                end = latLng;
+                    //save position into end
+                    end = latLng;
 
-                if (numOfMarkers < 2) {
-                    endPointMarker = new MarkerOptions().position(end).title("End point").draggable(true);
-                    mMap.addMarker(endPointMarker);
-                    //make sure we only have two markers on screen
-                    numOfMarkers = 2;
-                    drawPolyline();
-
-                }
-
-
-            }
-        });
-
-        //on marker drag listener
-        mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
-
-            @Override
-            public void onMarkerDragStart(Marker marker) {
-
-                fromPosition = marker.getPosition();
-
-                //check which marker
-                if (marker.getTitle() == "Start point"){
-                    start = marker.getPosition();
-                    start_fromPosition = marker.getPosition();
-
-                    //if we have two map markers, remove polyline
-                    if (numOfMarkers == 2) {
+                    if (numOfMarkers < 2) {
+                        endPointMarker = new MarkerOptions().position(end).title("End point").draggable(true);
+                        mMap.addMarker(endPointMarker);
+                        //make sure we only have two markers on screen
+                        numOfMarkers = 2;
                         drawPolyline();
+
                     }
 
-                }
-                else {
-                    end_fromPosition = marker.getPosition();
-                    end = marker.getPosition();
-                    //if we have two map markers, remove polyline
-                    if (numOfMarkers == 2) {
-                        drawPolyline();
-                    }
-                }
-
-
-            }
-
-            @Override
-            public void onMarkerDrag(Marker marker) {
-
-            }
-
-            @Override
-            public void onMarkerDragEnd(Marker marker) {
-
-                toPosition = marker.getPosition();
-
-                //check which marker was moved and save coordinates
-                if (marker.getTitle() == "Start point"){
-                    start_toPosition = marker.getPosition();
-                    start = marker.getPosition();
-                    //update position
-                    startPointMarker.position(start_toPosition);
-
-                    //draw polyline
-                    if (numOfMarkers == 2) {
-                        drawPolyline();
-                    }
 
                 }
-                else {
+            });
 
-                    //if second marker has been created
-                    if (numOfMarkers == 2) {
-                        end = marker.getPosition();
-                        end_toPosition = marker.getPosition();
-                        //update position
-                        endPointMarker.position(end_toPosition);
-                        //draw polyline
-                        drawPolyline();
-                    }
+            //on marker drag listener
+            mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
 
-                }
+                @Override
+                public void onMarkerDragStart(Marker marker) {
 
-                Toast.makeText(getApplicationContext(), "Marker " + marker.getTitle() + " dragged from " +
-                        fromPosition +  " to " + toPosition, Toast.LENGTH_LONG).show();
+                    fromPosition = marker.getPosition();
 
+                    //check which marker
+                    if (marker.getTitle() == "Start point"){
+                        start = marker.getPosition();
+                        start_fromPosition = marker.getPosition();
 
-            }
-        });
-
-
-        //setup button listener
-        Button createHotspotButton = (Button)findViewById(R.id.createHotspotButton);
-        createHotspotButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //ensure there are two markers
-                if (numOfMarkers < 2){
-
-                    //show alert
-                    AlertDialog alert = new AlertDialog.Builder(CreateHotspotActivity.this).create();
-                    alert.setTitle("Error");
-                    alert.setCancelable(false);
-                    alert.setMessage("No end point detected! To add an end point, tap the screen.");
-                    alert.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
+                        //if we have two map markers, remove polyline
+                        if (numOfMarkers == 2) {
+                            drawPolyline();
                         }
-                    });
 
-                    alert.show();
+                    }
+                    else {
+                        end_fromPosition = marker.getPosition();
+                        end = marker.getPosition();
+                        //if we have two map markers, remove polyline
+                        if (numOfMarkers == 2) {
+                            drawPolyline();
+                        }
+                    }
+
 
                 }
-                else {
-                    createNewHotspotDialog(v);
+
+                @Override
+                public void onMarkerDrag(Marker marker) {
+
                 }
 
-            }
-        });
+                @Override
+                public void onMarkerDragEnd(Marker marker) {
+
+                    toPosition = marker.getPosition();
+
+                    //check which marker was moved and save coordinates
+                    if (marker.getTitle() == "Start point"){
+                        start_toPosition = marker.getPosition();
+                        start = marker.getPosition();
+                        //update position
+                        startPointMarker.position(start_toPosition);
+
+                        //draw polyline
+                        if (numOfMarkers == 2) {
+                            drawPolyline();
+                        }
+
+                    }
+                    else {
+
+                        //if second marker has been created
+                        if (numOfMarkers == 2) {
+                            end = marker.getPosition();
+                            end_toPosition = marker.getPosition();
+                            //update position
+                            endPointMarker.position(end_toPosition);
+                            //draw polyline
+                            drawPolyline();
+                        }
+
+                    }
+
+                    Toast.makeText(getApplicationContext(), "Marker " + marker.getTitle() + " dragged from " +
+                            fromPosition +  " to " + toPosition, Toast.LENGTH_LONG).show();
 
 
-    }
+                }
+            });
+
+
+            //setup button listener
+            Button createHotspotButton = (Button)findViewById(R.id.createHotspotButton);
+            createHotspotButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    //ensure there are two markers
+                    if (numOfMarkers < 2){
+
+                        //show alert
+                        AlertDialog alert = new AlertDialog.Builder(CreateHotspotActivity.this).create();
+                        alert.setTitle("Error");
+                        alert.setCancelable(false);
+                        alert.setMessage("No end point detected! To add an end point, tap the screen.");
+                        alert.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                        alert.show();
+
+                    }
+                    else {
+                        createNewHotspotDialog(v);
+                    }
+
+                }
+            });
+
+        } //end else
+
+    } //end setUpMap
 
     //draw polyline method
     public void drawPolyline(){
@@ -333,7 +316,7 @@ public class CreateHotspotActivity extends FragmentActivity {
             polyline = false;
         }
 
-    }
+    } //end drawPolyline
 
     //map buttons
     public void normalMapButtonPressed(View view) {
@@ -576,7 +559,7 @@ public class CreateHotspotActivity extends FragmentActivity {
                 AppData.getInstance().setAppDataPopulated(true);
 
                 //add to database
-                db.insertData();
+                DatabaseHandler.getInstance(getApplicationContext()).insertData();
 
                 //Toast.makeText(getApplicationContext(), "Created file: " +
                  //               getApplicationContext().getDatabasePath(DatabaseHandler.DATABASE_NAME).toString(),
@@ -734,6 +717,37 @@ public class CreateHotspotActivity extends FragmentActivity {
 
         }
 
+    }
+
+    //get last known location
+    public Location getLastKnownLocation(){
+
+        List<String> providers = locationManager.getProviders(true);
+        Location bestLocation = null;
+
+        //iterate through all available providers
+        for(String provider : providers){
+
+            Location l = locationManager.getLastKnownLocation(provider);
+
+            if(l == null){
+                continue;
+            }
+
+            //if a better location accuracy is found in providers, set to bestLocation
+            if(bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()){
+
+                bestLocation = l;
+
+            }
+
+        }
+
+        if(bestLocation == null){
+            return null;
+        }
+
+        return bestLocation;
     }
 
 }

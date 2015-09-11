@@ -2,6 +2,7 @@ package group107.wifiapp;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -13,6 +14,8 @@ import java.io.Serializable;
  *
  */
 public class DatabaseHandler extends SQLiteOpenHelper {
+
+    public static DatabaseHandler instance;
 
     public static final String DATABASE_NAME = "Hotspot.db";
     public static final String TABLE_NAME = "hotspots";
@@ -31,8 +34,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static final String COLUMN13 = "DATAALLOWED";
     public static final String COLUMN14 = "TIMEALLOWED";
 
+    //getter
+    public static synchronized DatabaseHandler getInstance(Context context){
 
-    public DatabaseHandler(Context context) {
+        if (instance == null){
+            instance = new DatabaseHandler(context.getApplicationContext());
+        }
+
+        return instance;
+
+    }
+
+
+    private DatabaseHandler(Context context) {
         //context, name, version
         super(context, DATABASE_NAME, null, 1);
 
@@ -101,6 +115,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         return true;
+    }
+
+    //retrieve data
+    public Cursor retrieveAllData(){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor retrieved = db.rawQuery("select * from " + TABLE_NAME, null);
+        return retrieved;
     }
 
 }

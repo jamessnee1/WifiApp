@@ -165,7 +165,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
 
                 //clear database here
-                //db.deleteAllData(); Throws exception
+                DatabaseHandler.getInstance(getApplicationContext()).deleteAllData();
                 Toast.makeText(getApplicationContext(), "All hotspots deleted!", Toast.LENGTH_LONG).show();
 
             }
