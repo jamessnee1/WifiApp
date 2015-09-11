@@ -1,24 +1,30 @@
 package group107.wifiapp;
 
 import android.app.AlertDialog;
+import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ConnectToExistingHotspotActivity extends AppCompatActivity {
+public class ConnectToExistingHotspotActivity extends ListActivity {
 
-    public static String wifiToCheck = "RMIT-University";
+    public static String wifiToCheck = "RagnarosTheFirelord";
     private WifiManager wifiMgr;
 
     //create broadcast receiver
@@ -60,12 +66,45 @@ public class ConnectToExistingHotspotActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_connect_to_existing_hotspot);
+        //setContentView(R.layout.activity_connect_to_existing_hotspot);
 
         //search for wifi here
         wifiMgr = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         registerReceiver(mWifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiMgr.startScan();
+
+        //Create cursor of all values in database
+        Cursor retrieved = DatabaseHandler.getInstance(getApplicationContext()).retrieveAllData();
+
+        if (retrieved.getCount() == 0){
+
+            createDialog("Hotspots", "Error: no saved hotspots were found! " +
+                    "Create a new hotspot for it to appear in this list.", false);
+
+        }
+
+        //Go through retrieved hotspot details and populate the hotspot list
+        ArrayList<String> hotspotList = new ArrayList<String>();
+
+        while(retrieved.moveToNext()){
+
+            hotspotList.add("Hotspot name: " + retrieved.getString(1) + "\n" +
+                    "Number of allowed users: " + retrieved.getInt(3) + "\n" +
+                    "Allowed data: " + retrieved.getInt(12) + "mb\n");
+
+        }
+
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, hotspotList);
+        setListAdapter(adapter);
+
+    }
+
+    //Item selected in list will go to a new Google Maps activity and populate it with the chosen hotspot data
+    protected void onListItemClick(ListView l, View v, int position, long id){
+
+        String item = (String) getListAdapter().getItem(position);
+        Toast.makeText(this, item + " selected", Toast.LENGTH_SHORT).show();
 
     }
 
