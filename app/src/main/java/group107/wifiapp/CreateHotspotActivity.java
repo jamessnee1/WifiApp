@@ -52,7 +52,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 //Create Hotspot Activity, by James Snee
-//PLEASE NOTE: If you are running this code on your machine, you will need your own Google Maps API key
+//PLEASE NOTE: If you are running this code on your machine, you will need to add your own Google Maps API key
 //as the one provided in res/values/google_maps_api_xml is specific to my machine
 
 public class CreateHotspotActivity extends FragmentActivity {
@@ -201,7 +201,7 @@ public class CreateHotspotActivity extends FragmentActivity {
                     fromPosition = marker.getPosition();
 
                     //check which marker
-                    if (marker.getTitle() == "Start point"){
+                    if (marker.getTitle().equals("Start point")){
                         start = marker.getPosition();
                         start_fromPosition = marker.getPosition();
 
@@ -234,7 +234,7 @@ public class CreateHotspotActivity extends FragmentActivity {
                     toPosition = marker.getPosition();
 
                     //check which marker was moved and save coordinates
-                    if (marker.getTitle() == "Start point"){
+                    if (marker.getTitle().equals("Start point")){
                         start_toPosition = marker.getPosition();
                         start = marker.getPosition();
                         //update position
