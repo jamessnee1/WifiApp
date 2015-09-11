@@ -752,4 +752,5 @@ public class CreateHotspotActivity extends FragmentActivity {
         return bestLocation;
     } //end getLastKnownLocation
 
+
 }

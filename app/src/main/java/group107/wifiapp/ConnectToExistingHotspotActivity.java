@@ -68,6 +68,7 @@ public class ConnectToExistingHotspotActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_connect_to_existing_hotspot);
 
+
         //search for wifi here
         wifiMgr = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         registerReceiver(mWifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));

@@ -22,6 +22,8 @@ import java.lang.reflect.Method;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    private WifiManager wifiManager;
+    private WifiApManager wifiApManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         //wifi on/off switch
         Switch wifiSwitch = (Switch)findViewById(R.id.settingsWifiSwitch);
-        final WifiManager wifiManager = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+        wifiManager = (WifiManager)getSystemService(Context.WIFI_SERVICE);
 
         //wifi hotspot on/off switch
         Switch wifiHotspotSwitch = (Switch)findViewById(R.id.wifiHotspotSwitch);
@@ -46,7 +48,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         //set wifi hotspot switch on/off according to current hotspot status
-        if (isWifiHotspotOn(this) == true){
+        if (WifiApManager.getInstance(wifiManager).isWifiApEnabled()){
             wifiHotspotSwitch.setChecked(true);
             AppData.getInstance().setIsWifiHotspotEnabled(true);
         }
@@ -77,12 +79,12 @@ public class SettingsActivity extends AppCompatActivity {
 
                 //Switch status
                 if (isChecked) {
-                    //TODO: call set hotspot on, move these functions to another class and call them here
-                    //ApManager.configHotspot(SettingsActivity.this);
+
+                    turnOnOffHotspot(getApplicationContext(), true);
                     AppData.getInstance().setIsWifiHotspotEnabled(true);
                 } else {
-                    //TODO: call set hotspot off, move these functions to another class and call them here
-                    //ApManager.configHotspot(SettingsActivity.this);
+
+                    turnOnOffHotspot(getApplicationContext(), false);
                     AppData.getInstance().setIsWifiHotspotEnabled(false);
                 }
 
@@ -182,5 +184,21 @@ public class SettingsActivity extends AppCompatActivity {
 
         builder.show();
 
+    }
+
+    //turn on and off hotspot
+    public void turnOnOffHotspot(Context context, boolean isOn){
+        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+
+        wifiApManager = WifiApManager.getInstance(wifiManager);
+
+        if(wifiApManager != null){
+
+            //turn wifi off first
+            wifiManager.setWifiEnabled(false);
+
+            wifiApManager.setWifiApEnabled(wifiApManager.getApWifiConfiguration(), isOn);
+
+        }
     }
 }
