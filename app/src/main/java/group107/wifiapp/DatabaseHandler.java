@@ -93,7 +93,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(COLUMN1, AppData.getInstance().getSessionId());
+        //Don't put session ID in as this is the primary key, and is auto incremented
         contentValues.put(COLUMN2, AppData.getInstance().getHotspotName());
         contentValues.put(COLUMN3, AppData.getInstance().getPassword());
         contentValues.put(COLUMN4, AppData.getInstance().getNumOfUsers());
@@ -132,7 +132,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         //pretty much exactly the same as insertData, but we are going to just update the id of the hotspot
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(COLUMN1, AppData.getInstance().getSessionId());
+        //Don't put session ID in as this is the primary key, and is auto incremented
         contentValues.put(COLUMN2, AppData.getInstance().getHotspotName());
         contentValues.put(COLUMN3, AppData.getInstance().getPassword());
         contentValues.put(COLUMN4, AppData.getInstance().getNumOfUsers());
