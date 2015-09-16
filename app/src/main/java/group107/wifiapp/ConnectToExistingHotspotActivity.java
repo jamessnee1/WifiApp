@@ -26,6 +26,7 @@ public class ConnectToExistingHotspotActivity extends ListActivity {
 
     public static String wifiToCheck = "RMIT-University";
     private WifiManager wifiMgr;
+    private ArrayList<String> hotspotList;
 
     //create broadcast receiver
     private final BroadcastReceiver mWifiScanReceiver = new BroadcastReceiver() {
@@ -73,6 +74,13 @@ public class ConnectToExistingHotspotActivity extends ListActivity {
         //wifiMgr = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         //registerReceiver(mWifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         //wifiMgr.startScan();
+        
+
+    }
+
+    //onResume - if list has updated itself since loading this view, repopulate the list
+    protected void onResume(){
+        super.onResume();
 
         //Create cursor of all values in database
         Cursor retrieved = DatabaseHandler.getInstance(getApplicationContext()).retrieveAllData();
@@ -85,7 +93,7 @@ public class ConnectToExistingHotspotActivity extends ListActivity {
         }
 
         //Go through retrieved hotspot details and populate the hotspot list
-        ArrayList<String> hotspotList = new ArrayList<String>();
+        hotspotList = new ArrayList<String>();
 
         while(retrieved.moveToNext()){
 
