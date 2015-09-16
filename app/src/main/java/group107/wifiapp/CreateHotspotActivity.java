@@ -181,7 +181,7 @@ public class CreateHotspotActivity extends FragmentActivity {
 
                         //save position into end
                         end = latLng;
-                        
+
                         endPointMarker = new MarkerOptions().position(end).title("End point").draggable(true);
                         mMap.addMarker(endPointMarker);
                         //make sure we only have two markers on screen

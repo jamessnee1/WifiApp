@@ -24,7 +24,7 @@ import java.util.List;
 
 public class ConnectToExistingHotspotActivity extends ListActivity {
 
-    public static String wifiToCheck = "RagnarosTheFirelord";
+    public static String wifiToCheck = "RMIT-University";
     private WifiManager wifiMgr;
 
     //create broadcast receiver
@@ -69,10 +69,10 @@ public class ConnectToExistingHotspotActivity extends ListActivity {
         //setContentView(R.layout.activity_connect_to_existing_hotspot);
 
 
-        //search for wifi here
-        wifiMgr = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
-        registerReceiver(mWifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-        wifiMgr.startScan();
+        //search for wifi here - commented out because we may move this feature to another part of the app
+        //wifiMgr = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+        //registerReceiver(mWifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        //wifiMgr.startScan();
 
         //Create cursor of all values in database
         Cursor retrieved = DatabaseHandler.getInstance(getApplicationContext()).retrieveAllData();
