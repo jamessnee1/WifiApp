@@ -25,9 +25,9 @@ public class MainMenuActivity extends AppCompatActivity {
     protected void onResume(){
         super.onResume();
 
-        //if (AppData.getInstance().getAppDataPopulated() == true) {
-        //    startButton.setText("View current hotspot");
-        //}
+        if (AppData.getInstance().getAppDataPopulated() == true) {
+            startButton.setText("View current hotspot");
+        }
 
     }
 
@@ -40,20 +40,20 @@ public class MainMenuActivity extends AppCompatActivity {
 
         startButton = (Button)findViewById(R.id.startHotspotButton);
         //takes the user to a Google Maps Activity to view current hotspot data that is active
-        //if (AppData.getInstance().getAppDataPopulated() == true){
+        if (AppData.getInstance().getAppDataPopulated() == true){
 
-        //    Intent viewIntent = new Intent(this, ViewCurrentHotspotActivity.class);
-        //    startActivity(viewIntent);
+            Intent viewIntent = new Intent(this, ViewCurrentHotspotActivity.class);
+            startActivity(viewIntent);
 
-//        }
-  //      else {
+        }
+        else {
 
             //takes the user to a Google Maps Activity to start the process of creating
             //a new WiFi hotspot
             Intent intent = new Intent(this, CreateHotspotActivity.class);
             startActivity(intent);
 
-    //    }
+        }
 
     }
 

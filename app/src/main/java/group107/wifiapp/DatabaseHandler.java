@@ -126,6 +126,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return retrieved;
     }
 
+    //retrieve specific hotspot data from database and populate appData
+    public Cursor retrieveHotspot(int rowId, String hotspotName){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        
+        return null;
+    }
+
     //update data
     public boolean updateData(){
 
