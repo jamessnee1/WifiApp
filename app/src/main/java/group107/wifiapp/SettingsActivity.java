@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.provider.ContactsContract;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -205,10 +206,8 @@ public class SettingsActivity extends AppCompatActivity {
     //Takes user to device's APN settings page
     public void apnSettingsButtonPressed(View view) {
 
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setClassName("com.android.settings", "com.android.settings.ApnSettings");
-        startActivity(intent);
+        //startActivityForResult(new Intent(Settings.ACTION_APN_SETTINGS), 0);
+        startActivity(new Intent(Settings.ACTION_APN_SETTINGS));
 
     }
 }

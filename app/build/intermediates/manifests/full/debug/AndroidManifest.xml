@@ -87,6 +87,7 @@
             android:name="group107.wifiapp.ViewCurrentHotspotActivity"
             android:label="@string/title_activity_view_current_hotspot" >
         </activity>
+
         <!-- Include the AdActivity and InAppPurchaseActivity configChanges and themes. -->
         <activity
             android:name="com.google.android.gms.ads.AdActivity"

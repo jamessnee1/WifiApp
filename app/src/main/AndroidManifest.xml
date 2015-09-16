@@ -69,6 +69,7 @@
             android:name=".ViewCurrentHotspotActivity"
             android:label="@string/title_activity_view_current_hotspot" >
         </activity>
+
     </application>
 
 </manifest>
