@@ -201,4 +201,14 @@ public class SettingsActivity extends AppCompatActivity {
 
         }
     }
+
+    //Takes user to device's APN settings page
+    public void apnSettingsButtonPressed(View view) {
+
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setClassName("com.android.settings", "com.android.settings.ApnSettings");
+        startActivity(intent);
+
+    }
 }
