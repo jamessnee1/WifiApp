@@ -130,7 +130,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public Cursor retrieveHotspot(int rowId, String hotspotName){
 
         SQLiteDatabase db = this.getReadableDatabase();
-        
+
         return null;
     }
 
