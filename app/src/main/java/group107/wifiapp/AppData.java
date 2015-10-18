@@ -4,7 +4,7 @@ import android.net.wifi.WifiManager;
 import android.provider.ContactsContract;
 
 /**
- * Created by James on 8/13/2015.
+ * Created by James Snee on 8/13/2015.
  * This class is a singleton class which will store all the app settings
  * accessable from anywhere within the app
  */

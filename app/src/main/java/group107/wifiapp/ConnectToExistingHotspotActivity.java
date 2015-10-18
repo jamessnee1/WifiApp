@@ -22,6 +22,10 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Created by James Snee
+ */
+
 public class ConnectToExistingHotspotActivity extends ListActivity {
 
     public static String wifiToCheck = "RMIT-University";

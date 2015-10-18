@@ -7,8 +7,10 @@ import android.util.Log;
 import java.lang.reflect.Method;
 
 /**
- * Created by jamessnee on 11/09/15.
+ * Created by James Snee on 11/09/15.
  * Reference: http://omtlab.com/android-enable-disable-hotspot-programmatically/
+ * Since the WRITE_APN_SETTINGS permission was deprecated in Android Ice Cream Sandwich, we are not able to use
+ * this class.
  */
 public class WifiApManager {
 

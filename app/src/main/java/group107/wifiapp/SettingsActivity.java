@@ -21,6 +21,9 @@ import android.widget.Toast;
 
 import java.lang.reflect.Method;
 
+//Settings Activity, by James Snee
+//Mostly UI, Settings page to control certain things
+
 public class SettingsActivity extends AppCompatActivity {
 
     private WifiManager wifiManager;

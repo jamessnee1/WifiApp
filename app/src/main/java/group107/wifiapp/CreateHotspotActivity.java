@@ -9,6 +9,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
@@ -25,6 +26,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.Firebase;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,17 +41,29 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Document;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 //Create Hotspot Activity, by James Snee
 //PLEASE NOTE: If you are running this code on your machine, you will need to add your own Google Maps API key
@@ -81,6 +95,16 @@ public class CreateHotspotActivity extends FragmentActivity {
     int numOfUsersChoice = 0;
     int dataAllowedChoice = 0;
     int timeAllowedChoice = 0;
+    private Spinner modeSpinner;
+    private String selectedMode = "";
+
+    //maps vars
+    public final static String MODE_DRIVING = "DRIVING";
+    public final static String MODE_WALKING = "WALKING";
+
+    private JSONArray jRoutes = null;
+    private JSONArray jLegs = null;
+    private JSONArray jSteps = null;
 
 
 
@@ -140,6 +164,47 @@ public class CreateHotspotActivity extends FragmentActivity {
         //timer
         timerText = (TextView)findViewById(R.id.timerTextView);
         timerText.setText("00:00:00");
+
+        ArrayList<String> spinnerChoices = new ArrayList<String>();
+        Collections.addAll(spinnerChoices, "Choose mode:", "Driving", "Walking");
+
+        //mode spinner
+        modeSpinner = (Spinner)findViewById(R.id.modeSpinner);
+        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_spinner_item, spinnerChoices);
+        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        modeSpinner.setAdapter(spinnerArrayAdapter);
+
+        //set listeners to spinner
+        modeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                //we only have three positions
+                switch(position){
+
+                    case 0:
+                        selectedMode = "";
+                        break;
+                    case 1:
+                        selectedMode = "driving";
+                        break;
+                    case 2:
+                        selectedMode = "walking";
+                        break;
+                    default:
+                        selectedMode = "";
+                        break;
+
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         //Enable My Location button layer (user can choose this to get their location)
         mMap.setMyLocationEnabled(true);
@@ -565,6 +630,20 @@ public class CreateHotspotActivity extends FragmentActivity {
                 //add to database
                 DatabaseHandler.getInstance(getApplicationContext()).insertData();
 
+                //send to firebase
+                Firebase myFirebaseRef = new Firebase("https://wifiapp.firebaseio.com/");
+                myFirebaseRef.child("hotspot_name").setValue(AppData.getInstance().getHotspotName());
+                myFirebaseRef.child("hotspot_password").setValue(AppData.getInstance().getPassword());
+                myFirebaseRef.child("num_users").setValue(AppData.getInstance().getNumOfUsers());
+                myFirebaseRef.child("lat_startPoint").setValue(lat_startPt);
+                myFirebaseRef.child("long_startPoint").setValue(long_startPt);
+                myFirebaseRef.child("lat_endPoint").setValue(lat_endPt);
+                myFirebaseRef.child("long_endPoint").setValue(long_endPt);
+                myFirebaseRef.child("lat_startPoint").setValue(lat_startPt);
+                myFirebaseRef.child("dataAllowed").setValue(dataAllowedChoice);
+                myFirebaseRef.child("timeAllowed").setValue(timeAllowedChoice);
+
+
                 //Toast.makeText(getApplicationContext(), "Created file: " +
                  //               getApplicationContext().getDatabasePath(DatabaseHandler.DATABASE_NAME).toString(),
                 //        Toast.LENGTH_LONG).show();
@@ -754,5 +833,198 @@ public class CreateHotspotActivity extends FragmentActivity {
         return bestLocation;
     } //end getLastKnownLocation
 
+    //get method
+    public static String GET(String url) throws IOException {
+
+        InputStream inputStream = null;
+        String result = "";
+        HttpURLConnection urlConnection = null;
+
+        try {
+            URL googleMapsUrl = new URL(url);
+            urlConnection = (HttpURLConnection) googleMapsUrl.openConnection();
+            urlConnection.connect();
+            inputStream = urlConnection.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+            StringBuffer sb = new StringBuffer();
+            String line = "";
+
+            while((line = br.readLine()) != null){
+                sb.append(line);
+            }
+
+            result = sb.toString();
+            br.close();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            inputStream.close();
+            urlConnection.disconnect();
+        }
+        return result;
+    }
+
+
+    //AsyncTask for GET Request
+    private class GoogleMapsAsyncTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... url) {
+            try {
+                return GET(url[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected void onPostExecute(String result){
+            super.onPostExecute(result);
+
+            //parse JSON here
+            parseJSON(result);
+
+        }
+    }
+
+    //Parse JSON, from http://wptrafficanalyzer.in/blog/drawing-driving-route-directions-between-two-locations-using-google-directions-in-google-map-android-api-v2/
+    public List<List<HashMap<String,String>>> parse(JSONObject jObject){
+
+        List<List<HashMap<String, String>>> routes = new ArrayList<List<HashMap<String,String>>>() ;
+        JSONArray jRoutes = null;
+        JSONArray jLegs = null;
+        JSONArray jSteps = null;
+
+        try {
+
+            jRoutes = jObject.getJSONArray("routes");
+
+            /** Traversing all routes */
+            for(int i=0;i<jRoutes.length();i++){
+                jLegs = ( (JSONObject)jRoutes.get(i)).getJSONArray("legs");
+                List path = new ArrayList<HashMap<String, String>>();
+
+                /** Traversing all legs */
+                for(int j=0;j<jLegs.length();j++){
+                    jSteps = ( (JSONObject)jLegs.get(j)).getJSONArray("steps");
+
+                    /** Traversing all steps */
+                    for(int k=0;k<jSteps.length();k++){
+                        String polyline = "";
+                        polyline = (String)((JSONObject)((JSONObject)jSteps.get(k)).get("polyline")).get("points");
+                        List<LatLng> list = decodePoly(polyline);
+
+                        /** Traversing all points */
+                        for(int l=0;l<list.size();l++){
+                            HashMap<String, String> hm = new HashMap<String, String>();
+                            hm.put("lat", Double.toString(((LatLng)list.get(l)).latitude) );
+                            hm.put("lng", Double.toString(((LatLng)list.get(l)).longitude) );
+                            path.add(hm);
+                        }
+                    }
+                    routes.add(path);
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }catch (Exception e){
+        }
+
+        return routes;
+    }
+
+    /**
+     * Method to decode polyline points
+     * Courtesy : http://jeffreysambells.com/2010/05/27/decoding-polylines-from-google-maps-direction-api-with-java
+     * */
+    private List<LatLng> decodePoly(String encoded) {
+
+        List<LatLng> poly = new ArrayList<LatLng>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            LatLng p = new LatLng((((double) lat / 1E5)),
+                    (((double) lng / 1E5)));
+            poly.add(p);
+        }
+
+        return poly;
+    }
+
+
+    //Parse JSON into meaningful data
+    public void parseJSON(String input){
+
+
+        try {
+            //Create JSON object from input string
+            JSONObject json = new JSONObject(input);
+
+            //get routes
+            jRoutes = json.getJSONArray("routes");
+            //get first route
+            JSONObject route = jRoutes.getJSONObject(0);
+            //get all legs from first route
+            jLegs = route.getJSONArray("legs");
+            //get first leg
+            JSONObject leg = jLegs.getJSONObject(0);
+            //get steps
+            JSONObject steps = leg.getJSONObject("steps");
+
+            //loop through steps and populate map with markers
+            for(int i = 0; i < steps.length(); i++){
+
+
+            }
+
+
+        }
+        catch(JSONException e){
+
+
+        }
+
+
+
+    }
+
+    //construct our string URL for use with the Directions API
+    private String getMapsApiDirectionsUrl(LatLng start, LatLng end, String mode){
+
+        String waypoints = "origin=" + start.latitude +
+                "," + start.longitude + "&destination=" + end.latitude + "," + end.longitude;
+
+        String sensor = "sensor=false";
+        String modeOfTravel = "&mode=" + mode;
+        //if no mode is selected, it will default to driving
+        String params = waypoints + "&" + sensor + modeOfTravel;
+        String output = "json";
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + params;
+        return url;
+
+    }
 
 }

@@ -18,6 +18,8 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.concurrent.TimeUnit;
 
+//View Current Hotspot Activity, by James Snee
+
 public class ViewCurrentHotspotActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.

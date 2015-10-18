@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.io.Serializable;
 
 /**
- * Created by James on 8/15/2015.
+ * Created by James Snee on 8/15/2015.
  * Maintains methods for SQLite database
  *
  */
