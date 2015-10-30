@@ -124,6 +124,10 @@ public class ConnectToExistingHotspotActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id){
 
         String item = (String) getListAdapter().getItem(position);
+
+        //add all data from selected hotspot to the appData
+        
+
         Toast.makeText(this, item + " selected", Toast.LENGTH_SHORT).show();
 
     }

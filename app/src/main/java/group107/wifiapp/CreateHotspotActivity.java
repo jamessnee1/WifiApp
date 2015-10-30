@@ -15,6 +15,7 @@ import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -627,61 +628,74 @@ public class CreateHotspotActivity extends FragmentActivity {
                 //get inputs and send them to the AppData
                 //Hotspot name includes a suffix, this is to check later whether
                 //our app has created this wifi connection
-                String hotspot_name = hotspotName.getText().toString() + "-WifiApp";
+                String hotspot_name = hotspotName.getText().toString();
                 String hotspot_pass = hotspotPassword.getText().toString();
 
-                //isWifiHotspotEnabled;
-                double lat_startPt = start.latitude;
-                double long_startPt = start.longitude;
-                double lat_endPt = end.latitude;
-                double long_endPt = end.longitude;
+                //input validation of all fields
+                if(TextUtils.isEmpty(hotspot_name)){
+                    createErrorDialog("Error", "You must enter a Hotspot Name!");
+                }
+                else if (TextUtils.isEmpty(hotspot_pass)){
+                    createErrorDialog("Error", "You must enter a Hotspot Password!");
+                }
+                else {
 
-                AppData.getInstance().setSessionId(0); //Initially 0, this autoincrements
-                AppData.getInstance().setHotspotName(hotspot_name);
-                AppData.getInstance().setPassword(hotspot_pass);
-                AppData.getInstance().setIsUserConnected(1);
-                AppData.getInstance().setNumOfUsers(numOfUsersChoice);
-                AppData.getInstance().setIsWifiEnabled(true);
+                    //add suffix to hotspot name
+                    hotspot_name += "-WifiApp";
 
-                AppData.getInstance().setLat_startPoint(lat_startPt);
-                AppData.getInstance().setLong_startPoint(long_startPt);
-                AppData.getInstance().setLat_endPoint(lat_endPt);
-                AppData.getInstance().setLong_endPoint(long_endPt);
-                //startTime;
-                //endTime;
-                AppData.getInstance().setDataAllowed(dataAllowedChoice);
-                AppData.getInstance().setTimeAllowed(timeAllowedChoice);
+                    //isWifiHotspotEnabled;
+                    double lat_startPt = start.latitude;
+                    double long_startPt = start.longitude;
+                    double lat_endPt = end.latitude;
+                    double long_endPt = end.longitude;
 
-                //this is so we can view current hotspot data
-                AppData.getInstance().setAppDataPopulated(true);
+                    AppData.getInstance().setSessionId(0); //Initially 0, this autoincrements
+                    AppData.getInstance().setHotspotName(hotspot_name);
+                    AppData.getInstance().setPassword(hotspot_pass);
+                    AppData.getInstance().setIsUserConnected(1);
+                    AppData.getInstance().setNumOfUsers(numOfUsersChoice);
+                    AppData.getInstance().setIsWifiEnabled(true);
 
-                //add to database
-                DatabaseHandler.getInstance(getApplicationContext()).insertData();
+                    AppData.getInstance().setLat_startPoint(lat_startPt);
+                    AppData.getInstance().setLong_startPoint(long_startPt);
+                    AppData.getInstance().setLat_endPoint(lat_endPt);
+                    AppData.getInstance().setLong_endPoint(long_endPt);
+                    //startTime;
+                    //endTime;
+                    AppData.getInstance().setDataAllowed(dataAllowedChoice);
+                    AppData.getInstance().setTimeAllowed(timeAllowedChoice);
 
-                //send to firebase
-                Firebase myFirebaseRef = new Firebase("https://wifiapp.firebaseio.com/");
-                myFirebaseRef.child("hotspot_name").setValue(AppData.getInstance().getHotspotName());
-                myFirebaseRef.child("hotspot_password").setValue(AppData.getInstance().getPassword());
-                myFirebaseRef.child("num_users").setValue(AppData.getInstance().getNumOfUsers());
-                myFirebaseRef.child("lat_startPoint").setValue(lat_startPt);
-                myFirebaseRef.child("long_startPoint").setValue(long_startPt);
-                myFirebaseRef.child("lat_endPoint").setValue(lat_endPt);
-                myFirebaseRef.child("long_endPoint").setValue(long_endPt);
-                myFirebaseRef.child("lat_startPoint").setValue(lat_startPt);
-                myFirebaseRef.child("dataAllowed").setValue(dataAllowedChoice);
-                myFirebaseRef.child("timeAllowed").setValue(timeAllowedChoice);
+                    //this is so we can view current hotspot data
+                    AppData.getInstance().setAppDataPopulated(true);
+
+                    //add to database
+                    DatabaseHandler.getInstance(getApplicationContext()).insertData();
+
+                    //send to firebase
+                    Firebase myFirebaseRef = new Firebase("https://wifiapp.firebaseio.com/");
+                    myFirebaseRef.child("hotspot_name").setValue(AppData.getInstance().getHotspotName());
+                    myFirebaseRef.child("hotspot_password").setValue(AppData.getInstance().getPassword());
+                    myFirebaseRef.child("num_users").setValue(AppData.getInstance().getNumOfUsers());
+                    myFirebaseRef.child("lat_startPoint").setValue(lat_startPt);
+                    myFirebaseRef.child("long_startPoint").setValue(long_startPt);
+                    myFirebaseRef.child("lat_endPoint").setValue(lat_endPt);
+                    myFirebaseRef.child("long_endPoint").setValue(long_endPt);
+                    myFirebaseRef.child("lat_startPoint").setValue(lat_startPt);
+                    myFirebaseRef.child("dataAllowed").setValue(dataAllowedChoice);
+                    myFirebaseRef.child("timeAllowed").setValue(timeAllowedChoice);
 
 
-                //Toast.makeText(getApplicationContext(), "Created file: " +
-                 //               getApplicationContext().getDatabasePath(DatabaseHandler.DATABASE_NAME).toString(),
-                //        Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), "Created file: " +
+                    //               getApplicationContext().getDatabasePath(DatabaseHandler.DATABASE_NAME).toString(),
+                    //        Toast.LENGTH_LONG).show();
 
-                copyDatabase();
+                    copyDatabase();
 
-                //set the timer to count down
-                final TimerClass timer = new TimerClass(TimeUnit.MINUTES.toMillis(timeAllowedChoice), 1000);
-                timer.start();
+                    //set the timer to count down
+                    final TimerClass timer = new TimerClass(TimeUnit.MINUTES.toMillis(timeAllowedChoice), 1000);
+                    timer.start();
 
+                }
 
             }
         });
@@ -932,7 +946,7 @@ public class CreateHotspotActivity extends FragmentActivity {
             ArrayList<LatLng> points = null;
             lineOptions = null;
             MarkerOptions markerOptions = new MarkerOptions();
-            
+
 
             // Traversing through all the routes
             for(int i=0;i<result.size();i++){
@@ -978,7 +992,7 @@ public class CreateHotspotActivity extends FragmentActivity {
                 // Fetching the data from web service
                 data = downloadUrl(url[0]);
             }catch(Exception e){
-                Log.d("Background Task",e.toString());
+                Log.d("Background Task", e.toString());
             }
             return data;
         }
@@ -1102,5 +1116,28 @@ public class CreateHotspotActivity extends FragmentActivity {
         return url;
 
     }
+
+    //create error dialog box
+    public void createErrorDialog(String title, String message){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        builder.setTitle(title);
+        builder.setMessage(message);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+
+            }
+        });
+
+        builder.show();
+
+
+    }
+
 
 }
