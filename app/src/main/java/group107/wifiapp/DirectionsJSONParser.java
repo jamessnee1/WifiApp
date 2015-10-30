@@ -2,6 +2,8 @@ package group107.wifiapp;
 
 /**
  * Created by jamessnee on 30/10/15.
+ * Referenced from: from http://wptrafficanalyzer.in/blog/drawing-driving-route-directions-between-two-
+ * locations-using-google-directions-in-google-map-android-api-v2/
  */
 import java.util.ArrayList;
 import java.util.HashMap;

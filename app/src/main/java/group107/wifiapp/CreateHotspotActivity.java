@@ -98,6 +98,8 @@ public class CreateHotspotActivity extends FragmentActivity {
     int timeAllowedChoice = 0;
     private Spinner modeSpinner;
     private String selectedMode = "";
+    private String totalTravelDistance = "Distance: ";
+    private String totalTravelTime = "Time: ";
 
     //maps vars
     public final static String MODE_DRIVING = "DRIVING";
@@ -859,6 +861,10 @@ public class CreateHotspotActivity extends FragmentActivity {
         return bestLocation;
     } //end getLastKnownLocation
 
+    //Following Google Directions API code based on:
+    //from http://wptrafficanalyzer.in/blog/drawing-driving-route-directions-between-two-
+    //locations-using-google-directions-in-google-map-android-api-v2/
+
     /** A method to download json data from url */
     private String downloadUrl(String strUrl) throws IOException{
         String data = "";
@@ -926,6 +932,7 @@ public class CreateHotspotActivity extends FragmentActivity {
             ArrayList<LatLng> points = null;
             lineOptions = null;
             MarkerOptions markerOptions = new MarkerOptions();
+            
 
             // Traversing through all the routes
             for(int i=0;i<result.size();i++){
@@ -1022,7 +1029,7 @@ public class CreateHotspotActivity extends FragmentActivity {
         return result;
     }
 
-    //AsyncTask for GET Request
+    //AsyncTask for GET Request - CODE IS NOT CALLED, here for reference
     private class GoogleMapsAsyncTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -1043,92 +1050,6 @@ public class CreateHotspotActivity extends FragmentActivity {
 
         }
     }
-
-    //Parse JSON, from http://wptrafficanalyzer.in/blog/drawing-driving-route-directions-between-two-locations-using-google-directions-in-google-map-android-api-v2/
-    public List<List<HashMap<String,String>>> parse(JSONObject jObject){
-
-        List<List<HashMap<String, String>>> routes = new ArrayList<List<HashMap<String,String>>>() ;
-        JSONArray jRoutes = null;
-        JSONArray jLegs = null;
-        JSONArray jSteps = null;
-
-        try {
-
-            jRoutes = jObject.getJSONArray("routes");
-
-            /** Traversing all routes */
-            for(int i=0;i<jRoutes.length();i++){
-                jLegs = ( (JSONObject)jRoutes.get(i)).getJSONArray("legs");
-                List path = new ArrayList<HashMap<String, String>>();
-
-                /** Traversing all legs */
-                for(int j=0;j<jLegs.length();j++){
-                    jSteps = ( (JSONObject)jLegs.get(j)).getJSONArray("steps");
-
-                    /** Traversing all steps */
-                    for(int k=0;k<jSteps.length();k++){
-                        String polyline = "";
-                        polyline = (String)((JSONObject)((JSONObject)jSteps.get(k)).get("polyline")).get("points");
-                        List<LatLng> list = decodePoly(polyline);
-
-                        /** Traversing all points */
-                        for(int l=0;l<list.size();l++){
-                            HashMap<String, String> hm = new HashMap<String, String>();
-                            hm.put("lat", Double.toString(((LatLng)list.get(l)).latitude) );
-                            hm.put("lng", Double.toString(((LatLng)list.get(l)).longitude) );
-                            path.add(hm);
-                        }
-                    }
-                    routes.add(path);
-                }
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }catch (Exception e){
-        }
-
-        return routes;
-    }
-
-    /**
-     * Method to decode polyline points
-     * Courtesy : http://jeffreysambells.com/2010/05/27/decoding-polylines-from-google-maps-direction-api-with-java
-     * */
-    private List<LatLng> decodePoly(String encoded) {
-
-        List<LatLng> poly = new ArrayList<LatLng>();
-        int index = 0, len = encoded.length();
-        int lat = 0, lng = 0;
-
-        while (index < len) {
-            int b, shift = 0, result = 0;
-            do {
-                b = encoded.charAt(index++) - 63;
-                result |= (b & 0x1f) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lat += dlat;
-
-            shift = 0;
-            result = 0;
-            do {
-                b = encoded.charAt(index++) - 63;
-                result |= (b & 0x1f) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lng += dlng;
-
-            LatLng p = new LatLng((((double) lat / 1E5)),
-                    (((double) lng / 1E5)));
-            poly.add(p);
-        }
-
-        return poly;
-    }
-
 
     //Parse JSON into meaningful data
     public void parseJSON(String input){
